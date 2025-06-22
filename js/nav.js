@@ -52,10 +52,14 @@ function setupGlobalLinkHandling() {
         // Skip anchor links (same page)
         if (href.startsWith('#')) return;
         
-        // Skip if it's not an HTML file
-        if (!href.endsWith('.html')) return;
+        // Check if it's an internal link (either .html file or clean URL)
+        const isHtmlFile = href.endsWith('.html');
+        const isCleanUrl = href.startsWith('/') && !href.includes('.') && href !== '/';
+        const isRootUrl = href === '/';
         
-        // This is an internal HTML link - handle it with SPA navigation
+        if (!isHtmlFile && !isCleanUrl && !isRootUrl) return;
+        
+        // This is an internal link - handle it with SPA navigation
         e.preventDefault();
         
         const targetPage = getPageFromUrl(href);
@@ -66,13 +70,32 @@ function setupGlobalLinkHandling() {
             return;
         }
         
+        // Convert clean URLs to actual file paths for loading
+        let actualUrl = href;
+        if (isCleanUrl) {
+            actualUrl = href + '/index.html';
+        } else if (isRootUrl) {
+            actualUrl = '/index.html';
+        }
+        
         // Load the target page content
-        loadPageContent(href, targetPage);
+        loadPageContent(actualUrl, targetPage);
     });
 }
 
 // Function to extract page name from URL
 function getPageFromUrl(url) {
+    // Handle root URL
+    if (url === '/' || url === '/index.html') {
+        return 'home';
+    }
+    
+    // Handle clean URLs (e.g., /tools, /imprint)
+    if (url.startsWith('/') && !url.includes('.')) {
+        return url.substring(1); // Remove leading slash
+    }
+    
+    // Handle .html files
     const filename = url.split('/').pop().replace('.html', '');
     return filename === 'index' ? 'home' : filename;
 }
@@ -123,10 +146,11 @@ function loadPageContent(url, targetPage) {
                         currentMain.style.opacity = '1';
                         currentMain.style.transform = 'translateY(0)';
                         
-                        // Update browser history
-                        history.pushState({ page: targetPage }, '', url);
+                        // Update browser history with clean URL
+                        const cleanUrl = url.replace('/index.html', '') || '/';
+                        history.pushState({ page: targetPage }, '', cleanUrl);
                         
-                    }, 200);
+                    }, 50);
                 }
             }
         })
@@ -142,7 +166,16 @@ window.addEventListener('popstate', function(e) {
     if (e.state && e.state.page) {
         // Reload the page content based on the current URL
         const currentUrl = window.location.pathname;
-        loadPageContent(currentUrl, e.state.page);
+        
+        // Convert clean URL to actual file path for loading
+        let actualUrl = currentUrl;
+        if (currentUrl === '/') {
+            actualUrl = '/index.html';
+        } else if (!currentUrl.includes('.')) {
+            actualUrl = currentUrl + '/index.html';
+        }
+        
+        loadPageContent(actualUrl, e.state.page);
     } else {
         // Fallback: reload the page
         window.location.reload();
