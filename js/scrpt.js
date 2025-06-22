@@ -89,7 +89,7 @@ function initializeProfileImageSwitching() {
         
         // Store the original image source
         const originalSrc = newProfileImg.src;
-        const alternateSrc = '/img/profile.jpg';
+        const alternateSrc = '/img/profile-alt.jpg';
         let isOriginal = true;
         
         // Add click event listener to the entire container

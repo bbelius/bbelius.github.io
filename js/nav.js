@@ -1,5 +1,5 @@
 // Load navigation
-fetch('navigation.html')
+fetch('/navigation.html')
     .then(response => response.text())
     .then(data => {
         document.getElementById('navigation-placeholder').innerHTML = data;
