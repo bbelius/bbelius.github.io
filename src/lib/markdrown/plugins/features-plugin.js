@@ -120,7 +120,7 @@ export function featuresPlugin(parserInstance) {
                 html += `
                     <li data-feature="${Markdrown.escapeHTML(feature.id)}">
                         <i data-lucide="${Markdrown.escapeHTML(feature.icon)}" class="lucide"></i>
-                        ${Markdrown.escapeHTML(feature.title)}
+                        <span>${Markdrown.escapeHTML(feature.title)}</span>
                     </li>`;
             }
             html += `

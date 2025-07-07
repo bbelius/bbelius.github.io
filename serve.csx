@@ -1,4 +1,5 @@
 #r "nuget: Microsoft.AspNetCore.App, 9.0.0"
+#r "nuget: YamlDotNet, 13.7.1"
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +9,8 @@ using System.Text.RegularExpressions;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Channels;
+using System.Text.Json;
+using YamlDotNet.Serialization;
 
 // ---- Parameter handling ----
 string rootDir = Args.Count > 0 ? Path.GetFullPath(Args[0]) : Directory.GetCurrentDirectory();
@@ -20,6 +23,57 @@ if (!Directory.Exists(rootDir))
 Console.WriteLine($"Serving from: {rootDir}");
 
 // ---- Helper functions ----
+Dictionary<string, object> LoadGlobalVariables()
+{
+    var globalVars = new Dictionary<string, object>();
+    var globalYmlPath = Path.Combine(rootDir, "src", "global.yml");
+    
+    if (File.Exists(globalYmlPath))
+    {
+        try
+        {
+            var yamlContent = File.ReadAllText(globalYmlPath);
+            var deserializer = new DeserializerBuilder().Build();
+            var yamlObject = deserializer.Deserialize<Dictionary<string, object>>(yamlContent);
+            
+            if (yamlObject != null && yamlObject.ContainsKey("variables"))
+            {
+                // Handle the nested structure: variables: - baseUrl: "value"
+                var variablesSection = yamlObject["variables"];
+                if (variablesSection is List<object> variablesList)
+                {
+                    foreach (var item in variablesList)
+                    {
+                        if (item is Dictionary<object, object> variableDict)
+                        {
+                            foreach (var kvp in variableDict)
+                            {
+                                globalVars[kvp.Key.ToString()] = kvp.Value;
+                            }
+                        }
+                    }
+                }
+                else if (variablesSection is Dictionary<object, object> variablesDict)
+                {
+                    // Handle flat structure: variables: baseUrl: "value"
+                    foreach (var kvp in variablesDict)
+                    {
+                        globalVars[kvp.Key.ToString()] = kvp.Value;
+                    }
+                }
+            }
+            
+            Console.WriteLine($"Loaded {globalVars.Count} global variables from global.yml");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading global.yml: {ex.Message}");
+        }
+    }
+    
+    return globalVars;
+}
+
 string ParseHeaderValue(string text, string key)
 {
     var match = Regex.Match(text, @"^---\s*([\s\S]*?)---", RegexOptions.Multiline);
@@ -34,6 +88,44 @@ string RemoveHeader(string text)
     var match = Regex.Match(text, @"^---\s*([\s\S]*?)---\s*", RegexOptions.Multiline);
     if (!match.Success) return text;
     return text.Substring(match.Length);
+}
+
+string GenerateCanonicalUrl(string mdPath, string baseUrl, string customCanonicalUrl)
+{
+    if (!string.IsNullOrEmpty(customCanonicalUrl))
+    {
+        return customCanonicalUrl;
+    }
+    
+    // Get relative path from root directory
+    var relativePath = Path.GetRelativePath(rootDir, mdPath);
+    
+    // Convert to web path (forward slashes)
+    var webPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+    
+    // Remove .md extension and replace with .html, but handle index files specially
+    var fileName = Path.GetFileNameWithoutExtension(webPath);
+    var directory = Path.GetDirectoryName(webPath)?.Replace(Path.DirectorySeparatorChar, '/') ?? "";
+    
+    string finalPath;
+    if (fileName.Equals("index", StringComparison.OrdinalIgnoreCase))
+    {
+        // For index files, just use the directory path
+        finalPath = string.IsNullOrEmpty(directory) ? "/" : $"/{directory}/";
+    }
+    else
+    {
+        // For other files, include the filename
+        finalPath = string.IsNullOrEmpty(directory) ? $"/{fileName}.html" : $"/{directory}/{fileName}.html";
+    }
+    
+    // Combine with baseUrl if provided
+    if (string.IsNullOrEmpty(baseUrl))
+    {
+        return finalPath;
+    }
+    
+    return baseUrl.TrimEnd('/') + finalPath;
 }
 string InjectReloadOverlay(string html)
 {
@@ -114,7 +206,7 @@ watcher.EnableRaisingEvents = true;
 void CheckAndBroadcast(string path)
 {
     var ext = Path.GetExtension(path).ToLowerInvariant();
-    if (ext == ".md" || ext == ".tpl.html" || ext == ".css" || ext == ".js")
+    if (ext == ".md" || ext == ".tpl.html" || ext == ".css" || ext == ".js" || ext == ".html" || ext == ".yml" || ext == ".yaml")
     {
         reloadChannel.Writer.TryWrite(true);
     }
@@ -245,16 +337,182 @@ async Task ServeMarkdownAsHtml(HttpContext context, string mdPath, string search
         return;
     }
     var tplHtml = await File.ReadAllTextAsync(tplPath);
-    var mdContent = RemoveHeader(mdRaw);
-
-    string output;
-    if (tplHtml.Contains("<!-- MD_PLACEHOLDER -->"))
-        output = tplHtml.Replace("<!-- MD_PLACEHOLDER -->", mdContent);
-    else if (tplHtml.Contains("{{md}}"))
-        output = tplHtml.Replace("{{md}}", mdContent);
-    else
-        output = tplHtml + "\n" + mdContent;
+    
+    // Load global variables first
+    var globalVars = LoadGlobalVariables();
+    
+    // Parse markdown header values, with fallback to global variables
+    var title = ParseHeaderValue(mdRaw, "title") ?? globalVars.GetValueOrDefault("title")?.ToString() ?? "Untitled";
+    var subtitle = ParseHeaderValue(mdRaw, "subtitle") ?? globalVars.GetValueOrDefault("subtitle")?.ToString() ?? string.Empty;
+    var tags = ParseHeaderValue(mdRaw, "tags") ?? globalVars.GetValueOrDefault("tags")?.ToString() ?? "";
+    var date = ParseHeaderValue(mdRaw, "date") ?? globalVars.GetValueOrDefault("date")?.ToString() ?? "";
+    var description = ParseHeaderValue(mdRaw, "description") ?? globalVars.GetValueOrDefault("description")?.ToString() ?? "";
+    var author = ParseHeaderValue(mdRaw, "author") ?? globalVars.GetValueOrDefault("author")?.ToString() ?? "";
+    
+    // Handle baseUrl and canonicalUrl
+    var baseUrl = ParseHeaderValue(mdRaw, "baseUrl") ?? globalVars.GetValueOrDefault("baseUrl")?.ToString() ?? "";
+    var customCanonicalUrl = ParseHeaderValue(mdRaw, "canonicalUrl") ?? globalVars.GetValueOrDefault("canonicalUrl")?.ToString();
+    var canonicalUrl = GenerateCanonicalUrl(mdPath, baseUrl, customCanonicalUrl);
+    
+    string output = tplHtml;
+    
+    // Process file imports first (with circular reference protection)
+    output = ProcessFileImports(output, 0);
+    
+    // Process advanced template replacements (e.g., {{tags:%%template%%}})
+    output = ProcessAdvancedReplacements(output, mdRaw);
+    
+    // Replace simple template variables
+    output = output.Replace("{{md}}", mdRaw);
+    output = output.Replace("{{title}}", title);
+    output = output.Replace("{{subtitle}}", subtitle);
+    output = output.Replace("{{tags}}", tags);
+    output = output.Replace("{{date}}", date);
+    output = output.Replace("{{description}}", description);
+    output = output.Replace("{{author}}", author);
+    output = output.Replace("{{baseUrl}}", baseUrl);
+    output = output.Replace("{{canonicalUrl}}", canonicalUrl);
+    
+    // Replace any additional global variables
+    foreach (var kvp in globalVars)
+    {
+        var placeholder = $"{{{{{kvp.Key}}}}}";
+        if (output.Contains(placeholder) && !string.IsNullOrEmpty(kvp.Value?.ToString()))
+        {
+            output = output.Replace(placeholder, kvp.Value.ToString());
+        }
+    }
 
     context.Response.ContentType = "text/html";
     await context.Response.WriteAsync(InjectReloadOverlay(output));
+}
+
+
+// Process advanced template replacements like {{field:%%template%%}}
+string ProcessAdvancedReplacements(string template, string markdownRaw)
+{
+    // Pattern to match {{field:%%template%%}}
+    var pattern = @"\{\{(\w+):%%(.+?)%%\}\}";
+    var regex = new Regex(pattern, RegexOptions.Singleline);
+    
+    return regex.Replace(template, match =>
+    {
+        var fieldName = match.Groups[1].Value;
+        var itemTemplate = match.Groups[2].Value;
+        
+        var fieldValue = ParseHeaderValue(markdownRaw, fieldName);
+        if (string.IsNullOrEmpty(fieldValue))
+            return "";
+        
+        // Try to parse as JSON array
+        try
+        {
+            var jsonArray = JsonSerializer.Deserialize<string[]>(fieldValue);
+            if (jsonArray != null)
+            {
+                return string.Join("", jsonArray.Select(item => 
+                    itemTemplate.Replace("$", item)));
+            }
+        }
+        catch
+        {
+            // If not valid JSON, try to parse as comma-separated values
+            var items = fieldValue.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                 .Select(x => x.Trim())
+                                 .Where(x => !string.IsNullOrEmpty(x));
+            
+            return string.Join("", items.Select(item => 
+                itemTemplate.Replace("$", item)));
+        }
+        
+        return "";
+    });
+}
+
+// Process file imports with circular reference protection
+string ProcessFileImports(string template, int depth)
+{
+    // Prevent infinite recursion - max 10 levels of imports
+    if (depth >= 10)
+    {
+        Console.WriteLine($"Warning: Maximum import depth (10) reached, skipping further imports");
+        return template;
+    }
+    
+    // Pattern to match {{#filename.extension}} or {{#path/filename.extension}}
+    var importPattern = @"\{\{#([^}]+)\}\}";
+    var regex = new Regex(importPattern);
+    var matches = regex.Matches(template);
+    
+    if (matches.Count == 0)
+    {
+        return template; // No more imports to process
+    }
+    
+    bool hasReplacements = false;
+    
+    foreach (Match match in matches)
+    {
+        var fullMatch = match.Value;
+        var filePath = match.Groups[1].Value.Trim();
+        
+        try
+        {
+            // Try to resolve the file path
+            string resolvedPath = ResolveFilePath(filePath);
+            
+            if (File.Exists(resolvedPath))
+            {
+                string fileContent = File.ReadAllText(resolvedPath);
+                template = template.Replace(fullMatch, fileContent);
+                hasReplacements = true;
+                Console.WriteLine($"Imported file: {filePath} -> {resolvedPath}");
+            }
+            else
+            {
+                Console.WriteLine($"Warning: File not found for import: {filePath} (resolved to: {resolvedPath})");
+                // Replace with empty string or leave a comment
+                template = template.Replace(fullMatch, $"<!-- File not found: {filePath} -->");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error importing file {filePath}: {ex.Message}");
+            template = template.Replace(fullMatch, $"<!-- Error importing {filePath}: {ex.Message} -->");
+        }
+    }
+    
+    // If we made replacements, check for new imports recursively
+    if (hasReplacements)
+    {
+        return ProcessFileImports(template, depth + 1);
+    }
+    
+    return template;
+}
+
+string ResolveFilePath(string filePath)
+{
+    // If it's already an absolute path, use it as-is
+    if (Path.IsPathRooted(filePath))
+    {
+        return filePath;
+    }
+    
+    // Try relative to current directory first
+    string currentDirPath = Path.Combine(rootDir, filePath);
+    if (File.Exists(currentDirPath))
+    {
+        return currentDirPath;
+    }
+    
+    // Try relative to src directory
+    string srcPath = Path.Combine(rootDir, "src", filePath);
+    if (File.Exists(srcPath))
+    {
+        return srcPath;
+    }
+    
+    // Return the original path as fallback
+    return currentDirPath;
 }

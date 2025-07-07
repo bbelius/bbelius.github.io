@@ -1,6 +1,7 @@
 import { Markdrown } from '/lib/markdrown/markdrown.js';
 import { featuresPlugin } from '/lib/markdrown/plugins/features-plugin.js';
 import { constellationPlugin } from '/lib/markdrown/plugins/constellation-plugin.js';
+import { workflowStepsPlugin } from '/lib/markdrown/plugins/workflow-steps-plugin.js';
 
 // === COMMON UTILS ===
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
@@ -540,6 +541,7 @@ const mdParser = new Markdrown();
 mdParser.AddAllPlugins();
 mdParser.addPlugin(featuresPlugin());
 mdParser.addPlugin(constellationPlugin());
+mdParser.addPlugin(workflowStepsPlugin());
 
 // Function to initialize blog functionality (can be called during SPA navigation)
 function initializeBlogFunctionality() {

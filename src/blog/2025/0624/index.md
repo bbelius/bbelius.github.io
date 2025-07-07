@@ -1,6 +1,7 @@
 ---
 tpl: blog
 title: AI-Augmented Development
+subtitle: Building a Blog with AI Agents
 author: Benjamin Belikov
 date: 2025-06-24
 description: Experience regarding AI augumented development of this blog.
@@ -51,7 +52,9 @@ Final touches were made by hand mostly because it was faster than writing anothe
   Native high dynamic range (HDR) support for vibrant colors and better contrast with  compatibility for non-HDR displays and browsers.
 !/features
 
-### Used Tools
+---
+
+### Tooling
 
 !constellation HowTo
 * me | ![Ben Belikov](/img/profile.jpg) | Me
@@ -65,6 +68,14 @@ VSCode AI Agent extension, capable of understanding and executing complex coding
 * claude | brain-circuit | AI Agent | AI Agent: Claude Code
 % Code Generation, Perfect RooCode Compatibility, [Check it out](https://www.anthropic.com/)
 Claude is Anthropic's advanced AI assistant known for its strong code generation skills. It excels at understanding complex requirements and producing high-quality, well-structured code.
+
+* wsl | bird | WSL2 | WSL2: Windows Subsystem for Linux
+% Linux, Ubuntu, [Check it out](https://learn.microsoft.com/en-us/windows/wsl/install)
+Windows Subsystem for Linux (WSL) allows you to run a full Linux distribution alongside Windows. Of course, if you are using Linux or macOS, you don't need this component.
+
+* openrouter | trending-up-down | OpenRouter | OpenRouter: AI Gateway
+% Code Generation, RooCode Compatibility, [Check it out](https://openrouter.ai/)
+For tasks that require multiple AI models, OpenRouter provides a unified API to access various AI providers. It allows you to switch between models like Claude, Gemini, and others seamlessly.
 
 * lucide | shell | Lucide
 % Free & Open Source, 1000+ Icons, SVG Format, [Check it out](https://lucide.dev/)
@@ -81,40 +92,21 @@ Free static site hosting directly from GitHub repositories. GitHub Pages provide
 
 ### How it works
 
-<div class="workflow-steps">
-<div class="workflow-step" data-step="1">
-    <div class="step-number">1</div>
-    <div class="step-content">
-        <h4>Setup VSCode</h4>
-        <p>Install VSCode and the RooCode extension. Create an OpenRouter API key (or any provider you prefer) and configure RooCode with it and the AI model(s) you want to use.</p>
-    </div>
-</div>
-<div class="workflow-step" data-step="2">
-    <div class="step-number">2</div>
-    <div class="step-content">
-        <h4>AI-Assisted Development</h4>
-        <p>Prompt RooCode to generate code, refactor existing code, and/or implement complex features with natural language instructions.
-            Choose the AI Model that best fits your needs (Google's Gemini works great for large projects).</p>
-    </div>
-</div>
-<div class="workflow-step" data-step="3">
-    <div class="step-number">3</div>
-    <div class="step-content">
-        <h4>Iterative Refinement</h4>
-        <p>Continuously refine and improve through AI collaboration and/or manual intervention, testing different approaches and optimizing for performance and aesthetics.</p>
-    </div>
-</div>
-<div class="workflow-step" data-step="4">
-    <div class="step-number">4</div>
-    <div class="step-content">
-        <h4>Polish &amp; Deploy</h4>
-        <p>
-            Fine-tune the final product, clean up the code, and deploy the finished website.
-            You want to keep the technical debt low, so monitor what the AI does and guide it.
-        </p>
-    </div>
-</div>
-</div>
+!workflow stepbystep
+1. Setup VSCode
+Install VSCode and the RooCode extension. Create an OpenRouter API key (or any provider you prefer) and configure RooCode with it and the AI model(s) you want to use.
+
+2. AI-Assisted Development
+Prompt RooCode to generate code, refactor existing code, and/or implement complex features with natural language instructions.
+Choose the AI Model that best fits your needs (Google's Gemini works great for large projects).
+
+3. Iterative Refinement
+Continuously refine and improve through AI collaboration and/or manual intervention, testing different approaches and optimizing for performance and aesthetics.
+
+4. Polish & Deploy
+Fine-tune the final product, clean up the code, and deploy the finished website.
+You want to keep the technical debt low, so monitor what the AI does and guide it.
+!/workflow
 
 ### Results & Insights
 

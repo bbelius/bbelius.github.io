@@ -139,18 +139,18 @@ export function constellationPlugin(parserInstance) {
             const calculatePositions = (nodeCount) => {
                 const positions = [];
                 
+                const radius = 35; // Percentage from center - ensures perfect circle
+                const centerX = 50;
+                const centerY = 45;
+
                 // First node is always central
                 if (nodeCount > 0) {
-                    positions.push({ left: 50, top: 50 });
+                    positions.push({ left: centerX, top: centerY });
                 }
                 
                 // Remaining nodes arranged in perfect circle
                 const satelliteCount = nodeCount - 1;
                 if (satelliteCount === 0) return positions;
-                
-                const radius = 35; // Percentage from center - ensures perfect circle
-                const centerX = 50;
-                const centerY = 50;
                 
                 for (let i = 0; i < satelliteCount; i++) {
                     // Start from top (12 o'clock) and distribute evenly clockwise
