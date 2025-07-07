@@ -1,0 +1,336 @@
+/* 
+ * aurora.css - NorthLight design system
+ */
+
+/* Defaults */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ---- COLOR VARIABLES ---- */
+:root {
+  /* PRIMARY */
+  --aurora-primary: oklch(0.68 0.16 255); /* base blue */
+
+  --aurora-primary-a1: oklch(0.68 0.16 255 / 0.01);
+  --aurora-primary-a2: oklch(0.68 0.16 255 / 0.02);
+  --aurora-primary-a3: oklch(0.68 0.16 255 / 0.03);
+  --aurora-primary-a4: oklch(0.68 0.16 255 / 0.04);
+  --aurora-primary-a5: oklch(0.68 0.16 255 / 0.05);
+  --aurora-primary-a10: oklch(0.68 0.16 255 / 0.10);
+  --aurora-primary-a15: oklch(0.68 0.16 255 / 0.15);
+  --aurora-primary-a20: oklch(0.68 0.16 255 / 0.20);
+  --aurora-primary-a25: oklch(0.68 0.16 255 / 0.25);
+  --aurora-primary-a30: oklch(0.68 0.16 255 / 0.30);
+  --aurora-primary-a35: oklch(0.68 0.16 255 / 0.35);
+  --aurora-primary-a40: oklch(0.68 0.16 255 / 0.40);
+  --aurora-primary-a45: oklch(0.68 0.16 255 / 0.45);
+  --aurora-primary-a50: oklch(0.68 0.16 255 / 0.50);
+  --aurora-primary-a55: oklch(0.68 0.16 255 / 0.55);
+  --aurora-primary-a60: oklch(0.68 0.16 255 / 0.60);
+  --aurora-primary-a65: oklch(0.68 0.16 255 / 0.65);
+  --aurora-primary-a70: oklch(0.68 0.16 255 / 0.70);
+  --aurora-primary-a75: oklch(0.68 0.16 255 / 0.75);
+  --aurora-primary-a80: oklch(0.68 0.16 255 / 0.80);
+  --aurora-primary-a85: oklch(0.68 0.16 255 / 0.85);
+  --aurora-primary-a90: oklch(0.68 0.16 255 / 0.90);
+  --aurora-primary-a95: oklch(0.68 0.16 255 / 0.95);
+  --aurora-primary-a100: oklch(0.68 0.16 255 / 1.00);
+
+  /* White */
+  --aurora-white:       oklch(1 0 0);
+  --aurora-white-a1:    oklch(1 0 0 / 0.01);
+  --aurora-white-a2:    oklch(1 0 0 / 0.02);
+  --aurora-white-a3:    oklch(1 0 0 / 0.03);
+  --aurora-white-a4:    oklch(1 0 0 / 0.04);
+  --aurora-white-a5:    oklch(1 0 0 / 0.05);
+  --aurora-white-a10:   oklch(1 0 0 / 0.10);
+  --aurora-white-a15:   oklch(1 0 0 / 0.15);
+  --aurora-white-a20:   oklch(1 0 0 / 0.20);
+  --aurora-white-a25:   oklch(1 0 0 / 0.25);
+  --aurora-white-a30:   oklch(1 0 0 / 0.30);
+  --aurora-white-a35:   oklch(1 0 0 / 0.35);
+  --aurora-white-a40:   oklch(1 0 0 / 0.40);
+  --aurora-white-a45:   oklch(1 0 0 / 0.45);
+  --aurora-white-a50:   oklch(1 0 0 / 0.50);
+  --aurora-white-a55:   oklch(1 0 0 / 0.55);
+  --aurora-white-a60:   oklch(1 0 0 / 0.60);
+  --aurora-white-a65:   oklch(1 0 0 / 0.65);
+  --aurora-white-a70:   oklch(1 0 0 / 0.70);
+  --aurora-white-a75:   oklch(1 0 0 / 0.75);
+  --aurora-white-a80:   oklch(1 0 0 / 0.80);
+  --aurora-white-a85:   oklch(1 0 0 / 0.85);
+  --aurora-white-a90:   oklch(1 0 0 / 0.90);
+  --aurora-white-a95:   oklch(1 0 0 / 0.95);
+  --aurora-white-a100:  oklch(1 0 0 / 1.00);
+
+  /* Black */
+  --aurora-black: oklch(0 0 0);
+  --aurora-black-a1: oklch(0 0 0 / 0.01);
+  --aurora-black-a2: oklch(0 0 0 / 0.02);
+  --aurora-black-a3: oklch(0 0 0 / 0.03);
+  --aurora-black-a4: oklch(0 0 0 / 0.04);
+  --aurora-black-a5: oklch(0 0 0 / 0.05);
+  --aurora-black-a10: oklch(0 0 0 / 0.10);
+  --aurora-black-a15: oklch(0 0 0 / 0.15);
+  --aurora-black-a20: oklch(0 0 0 / 0.20);
+  --aurora-black-a25: oklch(0 0 0 / 0.25);
+  --aurora-black-a30: oklch(0 0 0 / 0.30);
+  --aurora-black-a35: oklch(0 0 0 / 0.35);
+  --aurora-black-a40: oklch(0 0 0 / 0.40);
+  --aurora-black-a45: oklch(0 0 0 / 0.45);
+  --aurora-black-a50: oklch(0 0 0 / 0.50);
+  --aurora-black-a55: oklch(0 0 0 / 0.55);
+  --aurora-black-a60: oklch(0 0 0 / 0.60);
+  --aurora-black-a65: oklch(0 0 0 / 0.65);
+  --aurora-black-a70: oklch(0 0 0 / 0.70);
+  --aurora-black-a75: oklch(0 0 0 / 0.75);
+  --aurora-black-a80: oklch(0 0 0 / 0.80);
+  --aurora-black-a85: oklch(0 0 0 / 0.85);
+  --aurora-black-a90: oklch(0 0 0 / 0.90);
+  --aurora-black-a95: oklch(0 0 0 / 0.95);
+
+  /* Background */
+  --aurora-bg-color: oklch(0.122 0.000 263.3);
+  --aurora-text-color: oklch(0.961 0.000 263.3);
+
+  /* SURFACE & GLASS */
+  --aurora-bg-glass: oklch(0.98 0.01 220 / 0.7);
+  --aurora-bg-glass-thin: oklch(0.96 0.012 220 / 0.5);
+  --aurora-dark-glass-bg: oklch(0.191 0.000 263.3 / 0.440);
+  --aurora-glass-border: oklch(1.000 0.000 263.3 / 0.110);
+  --aurora-bg-card: oklch(0.97 0.012 220 / 0.75);
+  --aurora-glass-highlight: oklch(1.000 0.000 263.3 / 0.055);
+
+  /* BORDERS & SHADOWS */
+  --aurora-border-glass: oklch(0.92 0.015 220 / 0.12);
+  --aurora-border-card: oklch(0.87 0.012 220 / 0.10);
+  --aurora-border-active: oklch(0.72 0.15 255 / 0.18);
+
+  --aurora-shadow-xs: 0 1px 2px oklch(0.12 0.01 220 / 0.04);
+  --aurora-shadow-sm: 0 2px 8px oklch(0.12 0.01 220 / 0.08);
+  --aurora-shadow-md: 0 8px 32px oklch(0.12 0.01 220 / 0.16);
+
+  /* TEXT */
+  --aurora-fg-base: oklch(0.88 0.02 220 / 0.85);
+  --aurora-fg-glass: oklch(0.98 0.01 220 / 0.7);
+  --aurora-fg-meta: oklch(0.88 0.01 220 / 0.58);
+  --aurora-fg-primary: var(--aurora-primary);
+
+  --aurora-shadow-inset: oklch(0.12 0.01 220 / 0.09);
+
+  --aurora-glare-angle: 0deg;
+  --aurora-glare-x: 50%;
+  --aurora-glare-y: 50%;
+}
+
+/* ---- GENERAL UTILITIES ---- */
+
+.flex { display: flex; }
+.flex-row { flex-direction: row; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.gap-xs { gap: 0.25rem; }
+.gap-sm { gap: 0.5rem; }
+.gap-md { gap: 1rem; }
+.gap-lg { gap: 1.5rem; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+
+.list-reset { list-style: none; margin: 0; padding: 0; }
+
+.radius-xs { border-radius: 6px; }
+.radius-sm { border-radius: 10px; }
+.radius-md { border-radius: 12px; }
+.radius-lg { border-radius: 16px; }
+.radius-xl { border-radius: 20px; }
+
+.shadow-xs { box-shadow: var(--aurora-shadow-xs); }
+.shadow-sm { box-shadow: var(--aurora-shadow-sm); }
+.shadow-md { box-shadow: var(--aurora-shadow-md); }
+.shadow-inset { box-shadow: inset 0 1px 2px var(--aurora-shadow-inset); }
+
+.opacity-70 { opacity: 0.7; }
+.opacity-85 { opacity: 0.85; }
+.opacity-100 { opacity: 1; }
+
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.p-3 { padding: 1rem; }
+.my-2 { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+
+.text-sm { font-size: 0.95em; }
+.text-base { font-size: 1em; }
+.text-lg { font-size: 1.15em; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.text-glass { color: var(--aurora-fg-glass); }
+.text-primary { color: var(--aurora-fg-primary); }
+
+/* ---- GLASS/SURFACE UTILITIES ---- */
+
+.glass {
+  background: var(--aurora-bg-glass);
+  border: 0.5px solid var(--aurora-border-glass);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.glass-thin {
+  background: var(--aurora-bg-glass-thin);
+  border: 0.5px solid var(--aurora-border-glass);
+}
+
+.glass-shadow {
+  box-shadow:
+    inset 0 1px 0 var(--aurora-white),
+    0 1px 3px var(--aurora-primary-a15);
+}
+
+/* Glass reflection */
+.glass-reflect::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg,
+    oklch(1 0 0 / 0.06) 0%,
+    oklch(1 0 0 / 0.01) 60%,
+    transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ---- BUTTONS ---- */
+
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 0.95em;
+  font-weight: 500;
+  color: var(--aurora-fg-glass);
+  background: var(--aurora-bg-glass-thin);
+  border: 0.5px solid var(--aurora-border-glass);
+  box-shadow: var(--aurora-shadow-xs);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(.16,1,.3,1);
+  overflow: hidden;
+  z-index: 0;
+}
+
+.button:hover, .button:focus-visible {
+  color: var(--aurora-white);
+  background: var(--aurora-primary-a15);
+  border-color: var(--aurora-border-active);
+  box-shadow: 0 2px 12px var(--aurora-primary-a30);
+}
+
+.button.active, .button:active {
+  color: var(--aurora-white);
+  background: var(--aurora-primary-a30);
+  border-color: var(--aurora-border-active);
+  box-shadow: 0 3px 18px var(--aurora-primary-a50);
+}
+
+.button .icon,
+.button svg {
+  width: 1.1em;
+  height: 1.1em;
+  opacity: 0.75;
+  transition: all 0.2s cubic-bezier(.16,1,.3,1);
+  color: var(--aurora-fg-primary);
+}
+
+.button:hover .icon, .button:hover svg {
+  opacity: 0.95;
+  transform: scale(1.05);
+  filter: drop-shadow(0 2px 6px var(--aurora-primary-a30));
+}
+
+.button.active .icon, .button.active svg,
+.button:active .icon, .button:active svg {
+  color: var(--aurora-fg-primary);
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+/* ---- CARDS/CONTAINERS ---- */
+
+.card {
+  position: relative;
+  border-radius: 16px;
+  background: var(--aurora-bg-card);
+  border: 0.5px solid var(--aurora-border-card);
+  box-shadow: var(--aurora-shadow-sm);
+  padding: 1.5rem;
+  overflow: hidden;
+  transition: box-shadow 0.3s cubic-bezier(.16,1,.3,1);
+}
+
+.card.compact { padding: 1rem; border-radius: 12px; }
+.card.expanded { padding: 2rem; border-radius: 20px; }
+
+/* ---- TYPOGRAPHY PATTERNS ---- */
+
+.heading {
+  font-size: 1.17rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: linear-gradient(135deg, var(--aurora-primary) 0%, var(--aurora-primary-a90) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.meta {
+  font-size: 0.93em;
+  color: var(--aurora-fg-meta);
+  margin-bottom: 0.75rem;
+  font-weight: 400;
+}
+
+.content {
+  line-height: 1.6;
+  color: var(--aurora-fg-base);
+}
+
+/* ---- ANIMATION UTILITIES ---- */
+
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(24px) scale(0.97);
+  animation: fadeInUp 0.6s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(24px) scale(0.97);}
+  100% { opacity: 1; transform: translateY(0) scale(1);}
+}
+
+.stagger-list > * {
+  opacity: 0;
+  animation: fadeInUp 0.5s cubic-bezier(.16,1,.3,1) forwards;
+}
+.stagger-list > *:nth-child(1) { animation-delay: 0.08s; }
+.stagger-list > *:nth-child(2) { animation-delay: 0.15s; }
+.stagger-list > *:nth-child(3) { animation-delay: 0.22s; }
+.stagger-list > *:nth-child(4) { animation-delay: 0.29s; }
+.stagger-list > *:nth-child(n+5) { animation-delay: 0.33s; }
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  .gap-md { gap: 0.5rem; }
+  .card, .card.expanded, .card.compact { padding: 1rem; }
+  .heading { font-size: 1.05rem; }
+}

@@ -23,16 +23,32 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://bbelius.dev/imprint">
 
-    <title>Imprint - bbelius.dev</title>
-    <link rel="stylesheet" href="/css/stl.css">
-
     <link rel="apple-touch-icon" sizes="180x180" href="/img/fav/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/img/fav/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/img/fav/favicon-16x16.png">
     <link rel="manifest" href="/img/fav/site.webmanifest">
+
+    <title>Imprint - bbelius.dev</title>
+
+    <link rel="stylesheet" href="/lib/northlight/aurora.css">
+    <link rel="stylesheet" href="/css/highlight.min.css">
+    <link rel="stylesheet" href="/css/tomorrow-night.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/stl.css">
+    <link rel="stylesheet" href="/css/markdrownXT.css">
+    <link rel="stylesheet" href="/lib/markdrown/plugins/features.css">
 </head>
-<body data-page="imprint">
-    <div id="navigation-placeholder"></div>
+<body data-page="imprint" class="aurora">
+  <div id="navigation-placeholder"></div>
+    
+  <!-- Blog Menu -->
+  <div id="blog-menu-container"></div>
+    
+  <!-- Desktop Menu Hover Trigger -->
+  <div class="blog-menu-hover-trigger" id="blog-menu-hover-trigger"></div>
+   
+  <!-- Desktop Menu Indicator (always visible) -->
+  <div class="blog-menu-indicator" id="blog-menu-indicator"></div>
 
     <main class="container">
         <style>
@@ -51,6 +67,14 @@
             <h1>Impressum | Imprint</h1>
             <h2>Impressum gemäß § 5 ECG</h2>
         </header>
+        <!-- Stats and Tab Navigation Bar -->
+        <div class="controls-bar">
+            <div class="stats-section">
+                <button class="blog-menu-toggle" aria-label="Toggle blog menu">
+                    <i data-lucide="menu" class="menu-icon"></i>
+                </button>
+            </div>
+        </div>
 
         <div class="main-content">
             <div class="legal-notice">
@@ -135,7 +159,9 @@
         </footer>
     </main>
 
-    <script src="/js/scrpt.js"></script>
-    <script src="/js/nav.js"></script>
+    <script src="/js/lucide.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script type="module" src="/lib/markdrown/markdrown.js"></script>
+    <script type="module" src="/js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Passthrough Plugin Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .markdown-source {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid #007bff;
+            margin-bottom: 20px;
+        }
+        .output {
+            border: 1px solid #28a745;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f8fff9;
+        }
+        .custom-alert {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .highlight-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 HTML Passthrough Plugin Demo</h1>
+    <p>This demo shows how the HTML passthrough plugin allows raw HTML to coexist with Markdown processing.</p>
+
+    <div class="demo-section">
+        <h2>📝 Demo: HTML + Markdown Mix</h2>
+        <div class="markdown-source" id="demo-source"></div>
+        <h3>✅ Rendered Output:</h3>
+        <div class="output" id="demo-output"></div>
+    </div>
+
+    <script type="module" src="/lib/markdrown/markdrown.js"></script>
+    <script type="module">
+        // Test markdown content that mixes HTML and Markdown
+        const testMarkdown = `# Welcome to HTML Passthrough Demo
+
+This is **regular markdown** that will be processed normally.
+
+<div class="custom-alert">
+  <h3>🚀 This is Raw HTML!</h3>
+  <p>This HTML block is passed through without any markdown processing.</p>
+  <button onclick="alert('HTML passthrough works!')">Click me!</button>
+</div>
+
+Back to *regular markdown* again. Here's a list:
+
+- Item 1 with **bold text**
+- Item 2 with *italic text*
+
+<div class="highlight-box">
+  <strong>Note:</strong> This HTML block demonstrates that:
+  <ul>
+    <li>HTML is preserved exactly as written</li>
+    <li>No escaping of &lt; or &gt; characters</li>
+    <li>JavaScript onclick handlers work</li>
+    <li>CSS classes are preserved</li>
+  </ul>
+</div>
+
+## How it works
+
+The plugin detects lines starting with HTML tags and processes them until it hits an empty line.
+
+<!-- This is an HTML comment that will be preserved -->
+<hr>
+
+That's it! The HTML passthrough plugin makes it easy to embed custom HTML in your Markdown.`;
+
+        // Initialize Markdrown with the HTML passthrough plugin
+        import { Markdrown } from '/lib/markdrown/markdrown.js';
+        const markdrown = new Markdrown();
+        
+        // Add the HTML passthrough plugin first (high priority)
+        markdrown.AddAllPlugins();
+                
+        // Display the source
+        document.getElementById('demo-source').textContent = testMarkdown;
+        
+        // Parse and display the result
+        const output = markdrown.parse(testMarkdown);
+        document.getElementById('demo-output').innerHTML = output;
+    </script>
+</body>
+</html>

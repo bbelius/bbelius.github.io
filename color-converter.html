@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Converter: sRGB, Display-P3, OKLCH</title>
+    <style>
+        :root {
+            --bg-color: oklch(0.102 0.000 0.0); /* #1a1a1a; */
+            --text-color: #f0f0f0;
+            --input-bg: #2a2a2a;
+            --input-border: #444;
+            --input-focus-border: #666;
+            --label-color: #bbb;
+            --copy-bg: #333;
+            --copy-hover-bg: #444;
+            --copy-active-bg: #555;
+            --copy-success-bg: #28a745;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0;
+            padding: 2rem;
+            font-size: 16px;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .converter-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        @media (min-width: 600px) {
+            .converter-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+
+        .color-input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .color-input-group label {
+            margin-bottom: 0.5rem;
+            color: var(--label-color);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper input {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            padding: 0.75rem;
+            padding-right: 4rem; /* Space for copy button */
+            font-size: 1rem;
+            font-family: "Source Code Pro", monospace;
+            width: 100%;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--input-focus-border);
+        }
+        
+        input[type="color"] {
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .copy-btn {
+            position: absolute;
+            right: 1px;
+            top: 1px;
+            bottom: 1px;
+            background-color: var(--copy-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 0 1rem;
+            border-radius: 0 3px 3px 0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--copy-hover-bg);
+        }
+        .copy-btn:active {
+            background-color: var(--copy-active-bg);
+        }
+        
+        .copy-btn.success {
+            background-color: var(--copy-success-bg);
+        }
+
+        .paste-btn {
+            background-color: var(--copy-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+            margin: 0 auto 2rem auto;
+            display: block;
+            font-family: inherit;
+        }
+
+        .paste-btn:hover {
+            background-color: var(--copy-hover-bg);
+        }
+
+        .paste-btn:active {
+            background-color: var(--copy-active-bg);
+        }
+
+        .paste-btn.success {
+            background-color: var(--copy-success-bg);
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Color Converter</h1>
+
+    <button class="paste-btn" id="paste-btn">📋 Paste from Clipboard</button>
+
+    <div class="converter-grid">
+        <div class="color-input-group">
+            <label for="srgb-picker">sRGB Color Picker</label>
+            <div class="input-wrapper">
+                <input type="color" id="srgb-picker" value="#ffffff">
+                <input type="text" id="srgb-hex" placeholder="#RRGGBB">
+                <button class="copy-btn" data-target="srgb-hex">Copy</button>
+            </div>
+        </div>
+
+        <div class="color-input-group">
+            <label for="srgb-text">sRGB CSS</label>
+            <div class="input-wrapper">
+                <input type="text" id="srgb-text" placeholder="rgb(r, g, b)">
+                <button class="copy-btn" data-target="srgb-text">Copy</button>
+            </div>
+        </div>
+
+        <div class="color-input-group">
+            <label for="p3-text">Display P3 CSS</label>
+            <div class="input-wrapper">
+                <input type="text" id="p3-text" placeholder="color(display-p3 r g b)">
+                <button class="copy-btn" data-target="p3-text">Copy</button>
+            </div>
+        </div>
+
+        <div class="color-input-group">
+            <label for="oklch-text">OKLCH CSS</label>
+            <div class="input-wrapper">
+                <input type="text" id="oklch-text" placeholder="oklch(l c h)">
+                <button class="copy-btn" data-target="oklch-text">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple color conversion utilities without external dependencies
+        class ColorConverter {
+            static hexToRgb(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            }
+
+            static rgbToHex(r, g, b) {
+                return "#" + [r, g, b].map(x => {
+                    const hex = Math.round(x).toString(16);
+                    return hex.length === 1 ? "0" + hex : hex;
+                }).join("");
+            }
+
+            static parseColor(colorStr) {
+                colorStr = colorStr.trim();
+                
+                // Handle hex colors
+                if (colorStr.startsWith('#')) {
+                    const rgb = this.hexToRgb(colorStr);
+                    return rgb ? { ...rgb, a: 1 } : null;
+                }
+                
+                // Handle rgba() colors
+                const rgbaMatch = colorStr.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+))?\s*\)/);
+                if (rgbaMatch) {
+                    return {
+                        r: parseInt(rgbaMatch[1]),
+                        g: parseInt(rgbaMatch[2]),
+                        b: parseInt(rgbaMatch[3]),
+                        a: rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1
+                    };
+                }
+                
+                // Handle color(display-p3 ...) colors with optional alpha
+                const p3Match = colorStr.match(/color\(display-p3\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)/);
+                if (p3Match) {
+                    const p3R = parseFloat(p3Match[1]);
+                    const p3G = parseFloat(p3Match[2]);
+                    const p3B = parseFloat(p3Match[3]);
+                    const alpha = p3Match[4] ? parseFloat(p3Match[4]) : 1;
+                    
+                    // Convert Display P3 to sRGB using accurate transformation
+                    const srgb = this.p3ToSrgb(p3R, p3G, p3B);
+                    
+                    return {
+                        r: Math.round(srgb.r * 255),
+                        g: Math.round(srgb.g * 255),
+                        b: Math.round(srgb.b * 255),
+                        a: alpha
+                    };
+                }
+                
+                // Handle oklch() colors with optional alpha - simplified conversion
+                const oklchMatch = colorStr.match(/oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)/);
+                if (oklchMatch) {
+                    const l = parseFloat(oklchMatch[1]);
+                    const c = parseFloat(oklchMatch[2]);
+                    const h = parseFloat(oklchMatch[3]) * (Math.PI / 180); // Convert to radians
+                    const alpha = oklchMatch[4] ? parseFloat(oklchMatch[4]) : 1;
+                    
+                    // Convert OKLCH to approximate RGB (simplified)
+                    const a = c * Math.cos(h);
+                    const b = c * Math.sin(h);
+                    
+                    // Very simplified Lab to RGB conversion
+                    const y = l;
+                    const x = y + a * 0.5;
+                    const z = y - b * 0.5;
+                    
+                    const r = Math.max(0, Math.min(1, x));
+                    const g = Math.max(0, Math.min(1, y));
+                    const bComp = Math.max(0, Math.min(1, z));
+                    
+                    return {
+                        r: Math.round(r * 255),
+                        g: Math.round(g * 255),
+                        b: Math.round(bComp * 255),
+                        a: alpha
+                    };
+                }
+                
+                return null;
+            }
+
+            // Accurate Display P3 to sRGB conversion
+            static p3ToSrgb(r, g, b) {
+                // Convert to linear RGB
+                const linearR = Math.pow(r, 2.2);
+                const linearG = Math.pow(g, 2.2);
+                const linearB = Math.pow(b, 2.2);
+                
+                // P3 to sRGB matrix transformation
+                const srgbLinearR = linearR * 1.2249401 + linearG * -0.2249404 + linearB * 0.0;
+                const srgbLinearG = linearR * -0.0420569 + linearG * 1.0420571 + linearB * 0.0;
+                const srgbLinearB = linearR * -0.0196376 + linearG * -0.0786361 + linearB * 1.0982735;
+                
+                // Clamp and apply gamma correction
+                const srgbR = Math.pow(Math.max(0, Math.min(1, srgbLinearR)), 1/2.2);
+                const srgbG = Math.pow(Math.max(0, Math.min(1, srgbLinearG)), 1/2.2);
+                const srgbB = Math.pow(Math.max(0, Math.min(1, srgbLinearB)), 1/2.2);
+                
+                return { r: srgbR, g: srgbG, b: srgbB };
+            }
+
+            static srgbToP3(r, g, b, a = 1) {
+                const rNorm = r / 255;
+                const gNorm = g / 255;
+                const bNorm = b / 255;
+                
+                // Convert to linear RGB
+                const linearR = Math.pow(rNorm, 2.2);
+                const linearG = Math.pow(gNorm, 2.2);
+                const linearB = Math.pow(bNorm, 2.2);
+                
+                // sRGB to P3 matrix transformation
+                const p3LinearR = linearR * 0.8224621 + linearG * 0.1775380 + linearB * 0.0;
+                const p3LinearG = linearR * 0.0331941 + linearG * 0.9668058 + linearB * 0.0;
+                const p3LinearB = linearR * 0.0170827 + linearG * 0.0723974 + linearB * 0.9105199;
+                
+                // Apply gamma correction and clamp
+                const p3R = Math.pow(Math.max(0, Math.min(1, p3LinearR)), 1/2.2);
+                const p3G = Math.pow(Math.max(0, Math.min(1, p3LinearG)), 1/2.2);
+                const p3B = Math.pow(Math.max(0, Math.min(1, p3LinearB)), 1/2.2);
+                
+                if (a < 1) {
+                    return `color(display-p3 ${p3R.toFixed(3)} ${p3G.toFixed(3)} ${p3B.toFixed(3)} / ${a.toFixed(3)})`;
+                }
+                return `color(display-p3 ${p3R.toFixed(3)} ${p3G.toFixed(3)} ${p3B.toFixed(3)})`;
+            }
+
+            static srgbToOklch(r, g, b, a = 1) {
+                const rNorm = r / 255;
+                const gNorm = g / 255;
+                const bNorm = b / 255;
+                
+                // sRGB to linear RGB
+                const linearR = rNorm <= 0.04045 ? rNorm / 12.92 : Math.pow((rNorm + 0.055) / 1.055, 2.4);
+                const linearG = gNorm <= 0.04045 ? gNorm / 12.92 : Math.pow((gNorm + 0.055) / 1.055, 2.4);
+                const linearB = bNorm <= 0.04045 ? bNorm / 12.92 : Math.pow((bNorm + 0.055) / 1.055, 2.4);
+                
+                // Linear RGB to XYZ (using D65 illuminant)
+                const x = linearR * 0.4124564 + linearG * 0.3575761 + linearB * 0.1804375;
+                const y = linearR * 0.2126729 + linearG * 0.7151522 + linearB * 0.0721750;
+                const z = linearR * 0.0193339 + linearG * 0.1191920 + linearB * 0.9503041;
+                
+                // XYZ to OKLab (simplified approximation)
+                const l = Math.cbrt(0.8189330101 * x + 0.3618667424 * y - 0.1288597137 * z);
+                const m = Math.cbrt(0.0329845436 * x + 0.9293118715 * y + 0.0361456387 * z);
+                const s = Math.cbrt(0.0482003018 * x + 0.2643662691 * y + 0.6338517070 * z);
+                
+                const L = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s;
+                const A = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s;
+                const B = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s;
+                
+                // Convert to OKLCH
+                const lightness = L;
+                const chroma = Math.sqrt(A * A + B * B);
+                let hue = Math.atan2(B, A) * 180 / Math.PI;
+                if (hue < 0) hue += 360;
+                
+                if (a < 1) {
+                    return `oklch(${lightness.toFixed(3)} ${chroma.toFixed(3)} ${hue.toFixed(1)} / ${a.toFixed(3)})`;
+                }
+                return `oklch(${lightness.toFixed(3)} ${chroma.toFixed(3)} ${hue.toFixed(1)})`;
+            }
+
+            static detectColorFormat(colorStr) {
+                colorStr = colorStr.trim();
+                
+                if (colorStr.startsWith('#')) {
+                    return 'hex';
+                }
+                if (colorStr.startsWith('rgb')) {
+                    return 'rgb';
+                }
+                if (colorStr.startsWith('color(display-p3')) {
+                    return 'p3';
+                }
+                if (colorStr.startsWith('oklch')) {
+                    return 'oklch';
+                }
+                return null;
+            }
+        }
+
+        window.onload = () => {
+            const srgbPicker = document.getElementById('srgb-picker');
+            const srgbHexInput = document.getElementById('srgb-hex');
+            const srgbTextInput = document.getElementById('srgb-text');
+            const p3TextInput = document.getElementById('p3-text');
+            const oklchTextInput = document.getElementById('oklch-text');
+            
+            let isUpdating = false;
+
+            function updateAllInputs(sourceElement, colorStr) {
+                if (isUpdating) return;
+                isUpdating = true;
+
+                const color = ColorConverter.parseColor(colorStr);
+
+                if (!color) {
+                    isUpdating = false;
+                    return;
+                }
+
+                const { r, g, b, a } = color;
+                const hexColor = ColorConverter.rgbToHex(r, g, b);
+                const rgbColor = a < 1 ? `rgba(${r}, ${g}, ${b}, ${a.toFixed(3)})` : `rgb(${r}, ${g}, ${b})`;
+                const p3Color = ColorConverter.srgbToP3(r, g, b, a);
+                const oklchColor = ColorConverter.srgbToOklch(r, g, b, a);
+
+                if (sourceElement !== srgbPicker) {
+                    srgbPicker.value = hexColor;
+                }
+                if (sourceElement !== srgbHexInput) {
+                    srgbHexInput.value = hexColor;
+                }
+                if (sourceElement !== srgbTextInput) {
+                    srgbTextInput.value = rgbColor;
+                }
+                if (sourceElement !== p3TextInput) {
+                    p3TextInput.value = p3Color;
+                }
+                if (sourceElement !== oklchTextInput) {
+                    oklchTextInput.value = oklchColor;
+                }
+                
+                isUpdating = false;
+            }
+            
+            function handleInput(e) {
+                updateAllInputs(e.target, e.target.value);
+            }
+
+            srgbPicker.addEventListener('input', handleInput);
+            srgbHexInput.addEventListener('input', handleInput);
+            srgbTextInput.addEventListener('input', handleInput);
+            p3TextInput.addEventListener('input', handleInput);
+            oklchTextInput.addEventListener('input', handleInput);
+
+            // Copy buttons
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    const targetInput = document.getElementById(targetId);
+                    navigator.clipboard.writeText(targetInput.value).then(() => {
+                        const originalText = button.textContent;
+                        button.textContent = 'Copied!';
+                        button.classList.add('success');
+                        setTimeout(() => {
+                            button.textContent = originalText;
+                            button.classList.remove('success');
+                        }, 1500);
+                    });
+                });
+            });
+
+            // Paste button
+            const pasteBtn = document.getElementById('paste-btn');
+            pasteBtn.addEventListener('click', async () => {
+                try {
+                    const clipboardText = await navigator.clipboard.readText();
+                    const format = ColorConverter.detectColorFormat(clipboardText);
+                    
+                    if (!format) {
+                        // Show error feedback
+                        const originalText = pasteBtn.textContent;
+                        pasteBtn.textContent = '❌ Invalid color format';
+                        pasteBtn.style.backgroundColor = '#dc3545';
+                        setTimeout(() => {
+                            pasteBtn.textContent = originalText;
+                            pasteBtn.style.backgroundColor = '';
+                        }, 2000);
+                        return;
+                    }
+
+                    // Determine which input to paste into
+                    let targetInput;
+                    switch (format) {
+                        case 'hex':
+                            targetInput = srgbHexInput;
+                            break;
+                        case 'rgb':
+                            targetInput = srgbTextInput;
+                            break;
+                        case 'p3':
+                            targetInput = p3TextInput;
+                            break;
+                        case 'oklch':
+                            targetInput = oklchTextInput;
+                            break;
+                    }
+
+                    // Paste and convert
+                    targetInput.value = clipboardText.trim();
+                    updateAllInputs(targetInput, clipboardText.trim());
+
+                    // Show success feedback
+                    const originalText = pasteBtn.textContent;
+                    pasteBtn.textContent = '✅ Pasted & Converted!';
+                    pasteBtn.classList.add('success');
+                    setTimeout(() => {
+                        pasteBtn.textContent = originalText;
+                        pasteBtn.classList.remove('success');
+                    }, 2000);
+
+                } catch (err) {
+                    // Show error feedback
+                    const originalText = pasteBtn.textContent;
+                    pasteBtn.textContent = '❌ Clipboard access denied';
+                    pasteBtn.style.backgroundColor = '#dc3545';
+                    setTimeout(() => {
+                        pasteBtn.textContent = originalText;
+                        pasteBtn.style.backgroundColor = '';
+                    }, 2000);
+                }
+            });
+
+            // Initial state
+            updateAllInputs(null, '#ffffff');
+        };
+    </script>
+</body>
+</html>

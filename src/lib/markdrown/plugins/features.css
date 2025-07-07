@@ -1,0 +1,381 @@
+/* Feature List Styles */
+
+.markdrown-content .feature-list {
+    margin-bottom: 2rem;
+}
+
+/* Feature Tags Styles */
+.markdrown-content .feature-tags {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.markdrown-content .feature-tags .tag {
+    padding: 6px 12px;
+    background: var(--aurora-primary-a10);
+    border: 1px solid var(--aurora-primary-a20);;
+    border-radius: 8px;
+    font-size: 0.85em;
+    color: var(--aurora-primary-a90);
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Style for tag links with external-link icons */
+.markdrown-content .feature-tags .tag a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.markdrown-content .feature-tags .tag a:hover {
+    color: var(--aurora-primary);
+}
+
+/* Center the external-link icon */
+.markdrown-content .feature-tags .tag a svg {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    stroke-width: 2.5;
+    vertical-align: middle;
+}
+
+.markdrown-content .feature-list ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 0;
+    animation: fadeInStagger 0.8s ease-out;
+}
+
+.markdrown-content .feature-list li {
+    background: linear-gradient(135deg,
+        rgba(255,255,255,0.05) 0%,
+        rgba(255,255,255,0.025) 30%,
+        var(--aurora-white-5) 70%,
+        rgba(0,0,0,0.015) 100%);
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 0.95em;
+    font-weight: 500;
+    border: 0.5px solid rgba(255,255,255,0.08);
+    color: rgba(255, 255, 255, 0.65);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transform: translateY(0) scale(1);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out forwards;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    box-shadow:
+        /* Smooth flat bevel edges - top light */
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        /* Smooth flat bevel edges - bottom shadow */
+        inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+        /* Smooth flat bevel edges - left light */
+        inset 1px 0 0 rgba(255, 255, 255, 0.06),
+        /* Smooth flat bevel edges - right shadow */
+        inset -1px 0 0 rgba(0, 0, 0, 0.04),
+        /* Subtle outer definition */
+        0 0 0 0.5px rgba(255, 255, 255, 0.02);
+}
+
+/* Icon styles for feature buttons */
+.markdrown-content .feature-list li .lucide,
+.markdrown-content .feature-list li svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex-shrink: 0;
+    stroke-width: 2;
+    opacity: 0.7;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: drop-shadow(0 0.5px 1px rgba(0, 0, 0, 0.1));
+    z-index: 3;
+    position: relative;
+}
+
+.markdrown-content .feature-list li:hover .lucide,
+.markdrown-content .feature-list li:hover svg {
+    opacity: 0.9;
+    transform: scale(1.05);
+    filter: drop-shadow(0 1px 2px var(--aurora-primary-a10));
+}
+
+.markdrown-content .feature-list li.active .lucide,
+.markdrown-content .feature-list li.active svg {
+    opacity: 1;
+    transform: scale(1.08);
+    filter: drop-shadow(0 1px 3px var(--aurora-primary-a20));
+    color: var(--aurora-primary);
+}
+
+/* Flat glass surface with subtle reflection */
+.markdrown-content .feature-list li::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.04) 0%,
+        rgba(255, 255, 255, 0.015) 30%,
+        transparent 60%);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Staggered animation for list items */
+.markdrown-content .feature-list li:nth-child(1) { animation-delay: 0.1s; }
+.markdrown-content .feature-list li:nth-child(2) { animation-delay: 0.15s; }
+.markdrown-content .feature-list li:nth-child(3) { animation-delay: 0.2s; }
+.markdrown-content .feature-list li:nth-child(4) { animation-delay: 0.25s; }
+.markdrown-content .feature-list li:nth-child(5) { animation-delay: 0.3s; }
+.markdrown-content .feature-list li:nth-child(6) { animation-delay: 0.35s; }
+.markdrown-content .feature-list li:nth-child(n+7) { animation-delay: 0.4s; }
+
+.markdrown-content .feature-list li:hover {
+    background: linear-gradient(135deg,
+        rgba(255,255,255,0.08) 0%,
+        var(--aurora-primary-a5) 30%,
+        rgba(255,255,255,0.035) 70%,
+        rgba(0,0,0,0.02) 100%);
+    color: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255,255,255,0.15);
+    transform: scale(1.005);
+    box-shadow:
+        /* Enhanced smooth flat bevel - top light */
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.18),
+        /* Enhanced smooth flat bevel - bottom shadow */
+        inset 0 -1.5px 0 rgba(0, 0, 0, 0.12),
+        /* Enhanced smooth flat bevel - left light */
+        inset 1.5px 0 0 rgba(255, 255, 255, 0.1),
+        /* Enhanced smooth flat bevel - right shadow */
+        inset -1.5px 0 0 rgba(0, 0, 0, 0.06),
+        /* Subtle glow while staying flat */
+        0 0 8px var(--aurora-primary-a10),
+        0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.markdrown-content .feature-list li:hover::before {
+    opacity: 0.5;
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(255, 255, 255, 0.025) 30%,
+        var(--aurora-primary-a5) 50%,
+        rgba(255, 255, 255, 0.02) 70%,
+        transparent 90%);
+}
+
+.markdrown-content .feature-list li.active {
+    background: linear-gradient(135deg,
+        var(--aurora-primary-a10) 0%,
+        rgba(255,255,255,0.07) 30%,
+        var(--aurora-primary-a5) 70%,
+        rgba(0,0,0,0.025) 100%);
+    color: rgba(255, 255, 255, 0.85);
+    border-color: var(--aurora-primary-a10);
+    transform: scale(1.01);
+    box-shadow:
+        /* Active smooth flat bevel - top light with primary accent */
+        inset 0 2px 0 rgba(255, 255, 255, 0.2),
+        /* Active smooth flat bevel - bottom shadow */
+        inset 0 -2px 0 rgba(0, 0, 0, 0.15),
+        /* Active smooth flat bevel - left light */
+        inset 2px 0 0 rgba(255, 255, 255, 0.12),
+        /* Active smooth flat bevel - right shadow */
+        inset -2px 0 0 rgba(0, 0, 0, 0.08),
+        /* Active glow while staying flat */
+        0 0 12px var(--aurora-primary-a10),
+        0 0 0 1px var(--aurora-primary-a5);
+}
+
+.markdrown-content .feature-list li.active::before {
+    opacity: 0.6;
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(var(--primary-rgb), 0.03) 20%,
+        rgba(255, 255, 255, 0.03) 40%,
+        rgba(var(--primary-rgb), 0.025) 60%,
+        rgba(255, 255, 255, 0.02) 80%,
+        transparent 100%);
+}
+
+.markdrown-content .feature-descriptions {
+    margin-top: 24px;
+}
+
+.markdrown-content .feature-description {
+    background: linear-gradient(145deg,
+        rgba(255,255,255,0.045) 0%,
+        rgba(var(--primary-rgb),0.025) 30%,
+        rgba(255,255,255,0.02) 70%,
+        rgba(0,0,0,0.01) 100%);
+    border: 0 solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 0 1.5rem;
+    margin: 0;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: translateY(-10px);
+    transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    position: relative;
+}
+
+.markdrown-content .feature-description.active {
+    opacity: 1;
+    max-height: 500px;
+    padding: 1.5rem 1.5rem;
+    transform: translateY(0);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    box-shadow:
+        /* Subtle liquid glass depth for description */
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        inset 0 -0.5px 0 rgba(0, 0, 0, 0.03),
+        inset 1px 0 0 rgba(255, 255, 255, 0.02),
+        inset -0.5px 0 0 rgba(0, 0, 0, 0.015),
+        /* Soft floating presence */
+        0 2px 8px var(--aurora-primary-a5),
+        0 1px 3px rgba(0,0,0,0.04),
+        0 0 0 0.5px rgba(255, 255, 255, 0.015);
+}
+
+/* Liquid glass surface for description */
+.markdrown-content .feature-description.active::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: radial-gradient(ellipse 250% 100% at 50% 0%,
+        rgba(255, 255, 255, 0.04) 0%,
+        rgba(255, 255, 255, 0.015) 50%,
+        transparent 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.markdrown-content .feature-description h4 {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 1.17rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg,
+        var(--aurora-primary) 0%,
+        var(--aurora-primary-a80) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.markdrown-content .feature-description h4 .lucide,
+.markdrown-content .feature-description h4 svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+}
+
+.markdrown-content .feature-meta {
+    font-size: 0.93em;
+    margin-bottom: 0.75rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.markdrown-content .feature-content {
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .markdrown-content .section.feature-list ul {
+        gap: 0.25rem;
+    }
+    .markdrown-content .section.feature-list li {
+        font-size: 0.93em;
+        padding: 0.6rem 1rem;
+    }
+    .markdrown-content .feature-description h4 {
+        font-size: 1.05rem;
+    }
+    .markdrown-content .feature-descriptions {
+        margin-top: 14px;
+    }
+}
+
+/* Keyframe Animations */
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes fadeInStagger {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+
+@keyframes gentleGlow {
+    0%, 100% {
+        opacity: 0.4;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* Flat surface light sweep effect */
+.markdrown-content .feature-list li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255,255,255,0.03) 45%,
+        rgba(255,255,255,0.06) 50%,
+        rgba(255,255,255,0.03) 55%,
+        transparent 100%);
+    transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2;
+    pointer-events: none;
+    border-radius: 12px;
+}
+
+.markdrown-content .feature-list li:hover::after {
+    left: 100%;
+    transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.markdrown-content .feature-list li {
+    position: relative;
+    z-index: 0;
+    overflow: hidden;
+}
+

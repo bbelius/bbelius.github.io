@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#121212">
+    <meta name="description" content="Ben Belikov's personal website, showcasing expertise in DevOps, Team Leadership, System Design, and more. Explore projects, skills, and contact information.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Ben Belikov - DevOps, Team Lead">
+    <meta property="og:description" content="Ben Belikov's personal website, showcasing expertise in DevOps, Team Leadership, System Design, and more. Explore projects, skills, and contact information.">
+    <meta property="og:image" content="https://bbelius.dev/img/profile.jpg">
+    <meta property="og:url" content="https://bbelius.dev/">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Ben Belikov - DevOps, Team Lead">
+    <meta name="twitter:description" content="Ben Belikov's personal website, showcasing expertise in DevOps, Team Leadership, System Design, and more. Explore projects, skills, and contact information.">
+    <meta name="twitter:image" content="https://bbelius.dev/img/profile.jpg">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://bbelius.dev/">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Benjamin Belikov",
+      "jobTitle": "DevOps Team Lead",
+      "url": "https://bbelius.dev",
+      "sameAs": [
+        "https://github.com/bbelius",
+        "https://at.linkedin.com/in/benjamin-belikov-738289235"
+      ]
+    }
+    </script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/fav/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/fav/favicon-16x16.png">
+    <link rel="manifest" href="/img/fav/site.webmanifest">
+
+    <title>Blog - bbelius.dev</title>
+
+    <link rel="stylesheet" href="/lib/northlight/aurora.css">
+    <link rel="stylesheet" href="/css/highlight.min.css">
+    <link rel="stylesheet" href="/css/tomorrow-night.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/stl.css">
+    <link rel="stylesheet" href="/css/markdrownXT.css">
+    <link rel="stylesheet" href="/lib/markdrown/plugins/features.css">
+    <link rel="stylesheet" href="/lib/markdrown/plugins/constellation.css">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/fav/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/fav/favicon-16x16.png">
+    <link rel="manifest" href="/img/fav/site.webmanifest">
+</head>
+<body data-page="blog" class="aurora">
+    <div id="navigation-placeholder"></div>
+    
+    <!-- Blog Menu -->
+    <div id="blog-menu-container"></div>
+    
+    <!-- Desktop Menu Hover Trigger -->
+    <div class="blog-menu-hover-trigger" id="blog-menu-hover-trigger"></div>
+    
+    <!-- Desktop Menu Indicator (always visible) -->
+    <div class="blog-menu-indicator" id="blog-menu-indicator"></div>
+
+    <main class="container">
+        <!-- Blog Header -->
+        <header>
+            <div class="profile-pic-wrapper">
+                <div class="profile-pic-highlight" id="profileHighlight">
+                    <img src="/img/profile.jpg" alt="Ben Belikov">
+                </div>
+            </div>
+            <h1>Ben Belikov</h1>
+            <h2>DevOps &middot; Team Lead</h2>
+        </header>
+
+        <!-- Stats and Tab Navigation Bar -->
+        <div class="controls-bar">
+            <div class="stats-section">
+                <button class="blog-menu-toggle" aria-label="Toggle blog menu">
+                    <i data-lucide="menu" class="menu-icon"></i>
+                </button>
+                <span id="word-count">0 words</span>
+                <span id="char-count">0 chars</span>
+            </div>
+            <div class="tab-buttons">
+                <div class="tab-button" data-tab="source">
+                    <i data-lucide="code" class="tab-icon"></i>
+                </div>
+                <div class="tab-button active" data-tab="preview">
+                    <i data-lucide="eye" class="tab-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content blog">
+            <!-- Blog Post Viewer -->
+            <div class="blog-viewer">
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <div id="source-tab" class="tab-pane">
+                        <div class="source-viewer">
+                            <div class="source-container">
+                                <div class="line-numbers" id="line-numbers"></div>
+                                <pre id="markdrown-source">
+<code class="language-markdown">{{md}}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview Tab -->
+                    <div id="preview-tab" class="tab-pane active">
+                        <div class="preview-container">
+                            <div id="markdrown-output" class="markdrown-content"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Benjamin Belikov | <a href="/imprint">Imprint</a></p>
+        </footer>
+    </main>
+
+    <script src="/js/lucide.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script type="module" src="/lib/markdrown/markdrown.js"></script>
+    <script type="module" src="/js/main.js"></script>
+</body>
+</html>
