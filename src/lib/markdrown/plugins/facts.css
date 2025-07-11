@@ -1,0 +1,101 @@
+/* Facts Grid */
+.facts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.facts-grid .facts-card {
+    padding: 20px;
+    border: 0.5px solid var(--aurora-white-a10);
+    background: radial-gradient(ellipse 250% 100% at 50% 0%, var(--aurora-white-a4) 0%, var(--aurora-white-a2) 50%, transparent 100%);
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-align: center;
+    box-shadow: inset 0 1px 0 var(--aurora-white-a5), inset 0 -0.5px 0 var(--aurora-black-a3), inset 1px 0 0 var(--aurora-white-a2), inset -0.5px 0 0 var(--aurora-black-a2), 0 2px 8px var(--aurora-primary-a5), 0 1px 3px var(--aurora-black-a4), 0 0 0 0.5px var(--aurora-white-a2);
+}
+
+.facts-grid .facts-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--aurora-black-a20);
+}
+
+.facts-grid .facts-card.green {
+    box-shadow: inset 0 1px 0 var(--aurora-green-a15),
+      inset 0 -0.5px 0 var(--aurora-black-a5),
+      inset 1px 0 0 var(--aurora-green-a5), 
+      inset -0.5px 0 0 var(--aurora-black-a4),
+      0 2px 8px var(--aurora-green-a8),
+      0 1px 3px var(--aurora-black-a10),
+      0 0 0 0.5px var(--aurora-green-a5);
+}
+
+.facts-grid .facts-card.green:hover {
+    background: var(--aurora-green-a10);
+}
+
+.facts-grid .facts-card.yellow {
+    box-shadow: inset 0 1px 0 var(--aurora-yellow-a15),
+      inset 0 -0.5px 0 var(--aurora-black-a5),
+      inset 1px 0 0 var(--aurora-yellow-a5), 
+      inset -0.5px 0 0 var(--aurora-black-a4),
+      0 2px 8px var(--aurora-yellow-a8),
+      0 1px 3px var(--aurora-black-a10),
+      0 0 0 0.5px var(--aurora-yellow-a5);
+}
+
+.facts-grid .facts-card.yellow:hover {
+    background: var(--aurora-yellow-a10);
+}
+
+.facts-grid .facts-card.red {
+    box-shadow: inset 0 1px 0 var(--aurora-red-a15),
+      inset 0 -0.5px 0 var(--aurora-black-a5),
+      inset 1px 0 0 var(--aurora-red-a5), 
+      inset -0.5px 0 0 var(--aurora-black-a4),
+      0 2px 8px var(--aurora-red-a8),
+      0 1px 3px var(--aurora-black-a10),
+      0 0 0 0.5px var(--aurora-red-a5);
+}
+
+.facts-grid .facts-card.red:hover {
+    background: var(--aurora-red-a10);
+}
+
+.facts-grid .facts-icon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+    font-size: 1.5rem;
+}
+
+.facts-grid .facts-card.green .facts-icon svg {
+    color: var(--aurora-green-a80);
+}
+
+.facts-grid .facts-card.yellow .facts-icon svg {
+    color: var(--aurora-yellow-a80);
+}
+
+.facts-grid .facts-card.red .facts-icon svg {
+    color: var(--aurora-red-a80);
+}
+
+.facts-grid .facts-card h4 {
+    margin: 0 0 8px 0;
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--aurora-white-a90);
+}
+
+.facts-grid .facts-card h4::after {
+    display: none;
+}
+
+.facts-grid .facts-card p {
+    margin: 0;
+    font-size: 0.85em;
+    color: var(--aurora-white-a70);
+    line-height: 1.5;
+}

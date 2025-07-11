@@ -1,2 +1,5 @@
 variables:
 - baseUrl: "https://bbelius.dev"
+
+preprocess:
+- "menu.tpl.html"

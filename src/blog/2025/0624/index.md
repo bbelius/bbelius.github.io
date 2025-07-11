@@ -6,7 +6,7 @@ author: Benjamin Belikov
 date: 2025-06-24
 description: Experience regarding AI augumented development of this blog.
 tags: ["blog", "ai", "agent"]
-type: projects
+category: projects
 ---
 
 ### How to Create This Website
@@ -51,8 +51,6 @@ Final touches were made by hand mostly because it was faster than writing anothe
 / Colorful and Vibrant
   Native high dynamic range (HDR) support for vibrant colors and better contrast with  compatibility for non-HDR displays and browsers.
 !/features
-
----
 
 ### Tooling
 
@@ -110,33 +108,16 @@ You want to keep the technical debt low, so monitor what the AI does and guide i
 
 ### Results & Insights
 
-<div class="insights-grid">
-<div class="insight-card positive" style="opacity: 1; transform: translateX(0px); transition: opacity 0.5s, transform 0.5s;">
-    <div class="insight-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gauge-icon lucide-gauge"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg>
-    </div>
-    <h4>Impressive Speed</h4>
-    <p>Complex features in minutes - not hours</p>
-</div>
-<div class="insight-card neutral" style="opacity: 1; transform: translateX(0px); transition: opacity 0.5s 0.1s, transform 0.5s 0.1s;">
-    <div class="insight-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rabbit-icon lucide-rabbit"><path d="M13 16a3 3 0 0 1 2.24 5"></path><path d="M18 12h.01"></path><path d="M18 21h-8a4 4 0 0 1-4-4 7 7 0 0 1 7-7h.2L9.6 6.4a1 1 0 1 1 2.8-2.8L15.8 7h.2c3.3 0 6 2.7 6 6v1a2 2 0 0 1-2 2h-1a3 3 0 0 0-3 3"></path><path d="M20 8.54V4a2 2 0 1 0-4 0v3"></path><path d="M7.612 12.524a3 3 0 1 0-1.6 4.3"></path></svg>
-    </div>
-    <h4>Fast Output</h4>
-    <p>Fast, but fragile. Monitor it to avoid regressions.</p>
-</div>
-<div class="insight-card neutral" style="opacity: 1; transform: translateX(0px); transition: opacity 0.5s 0.2s, transform 0.5s 0.2s;">
-    <div class="insight-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-spline-icon lucide-chart-spline"><path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="M7 16c.5-2 1.5-7 4-7 2 0 2 3 4 3 2.5 0 4.5-5 5-7"></path></svg>
-    </div>
-    <h4>Learning Curve</h4>
-    <p>Prompting is a skill. Garbage in, garbage out.</p>
-</div>
-<div class="insight-card negative" style="opacity: 1; transform: translateX(0px); transition: opacity 0.5s 0.3s, transform 0.5s 0.3s;">
-    <div class="insight-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock-alert-icon lucide-clock-alert"><path d="M12 6v6l4 2"></path><path d="M16 21.16a10 10 0 1 1 5-13.516"></path><path d="M20 11.5v6"></path><path d="M20 21.5h.01"></path></svg>
-    </div>
-    <h4>Cost &amp; Time</h4>
-    <p>Delegate to AI - but stay in control.</p>
-</div>
-</div>
+!facts insights
+* speed | gauge | green | Impressive Speed
+  Complex features in minutes - not hours
+
+* fast | rabbit | yellow | Fast Output
+  Fast, but fragile. Avoid regressions.
+
+* learning-curve | chart-spline | yellow | Learning Curve
+  Prompting is a skill. Garbage in, garbage out.
+
+* cost | clock-alert | red | Cost & Time
+  Delegate to AI - but stay in control.
+!/facts

@@ -1,0 +1,45 @@
+<!-- Blog Menu Structure -->
+<div class="blog-menu-overlay" id="blog-menu-overlay">
+    <div class="blog-menu-content">
+        <div class="menu-header">
+            <h3 class="brand-text">Blog Posts</h3>
+            <button class="menu-close-btn" id="menu-close-btn" aria-label="Close menu">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        
+        <div class="menu-search">
+            <div class="search-input-wrapper">
+                <input type="text" id="menu-search" placeholder="Search posts..." />
+                <button class="search-clear-btn" id="search-clear-btn" aria-label="Clear search" style="display: none;">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="menu-categories">
+            <div class="category-filter active" data-category="all">All Posts</div>
+            <div class="category-filter" data-category="tutorials">Tutorials</div>
+            <div class="category-filter" data-category="projects">Projects</div>
+            <div class="category-filter" data-category="thoughts">Thoughts</div>
+        </div>
+        
+        <div class="menu-posts" id="menu-posts">
+            {{::blog
+            <article class="menu-post-item"
+                     data-title="{{title}}"
+                     data-author="{{author}}"
+                     data-date="{{date}}"
+                     data-description="{{description}}"
+                     data-tags='{{tags}}'
+                     data-category="{{category}}"
+                     data-slug="{{slug}}"
+                     data-type="{{type}}">
+            </article>
+            blog::}}
+        </div>
+    </div>
+</div>
+
+<!-- Blog Menu Backdrop -->
+<div class="blog-menu-backdrop" id="blog-menu-backdrop"></div>

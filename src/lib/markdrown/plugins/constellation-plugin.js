@@ -7,22 +7,26 @@ export function constellationPlugin(parserInstance) {
         
         postRender: (registerCallback) => {
             registerCallback(container => {
-                container.querySelectorAll('.constellation-container').forEach(constellation => {
+                container.querySelectorAll('.constellation.frame').forEach(constellation => {
                     if (constellation._constellationInitialized) return;
                     constellation._constellationInitialized = true;
 
-                    const constellationNodes = constellation.querySelectorAll('.node-btn, .constellation-node');
-                    const detailsPanel = constellation.nextElementSibling;
-                    const constellationContents = detailsPanel ? detailsPanel.querySelectorAll('.constellation-content') : [];
+                    const constellationNodes = constellation.querySelectorAll('.constellation .node-btn, .constellation .constellation-node');
+                    
+                    // Changed: Look for details panel within the same parent frame
+                    const constellationFrame = constellation.closest('.constellation.frame');
+                    const detailsPanel = constellationFrame ? constellationFrame.querySelector('.constellation .constellation-details') : null;
+                    
+                    const constellationContents = detailsPanel ? detailsPanel.querySelectorAll('.constellation .constellation-content') : [];
                     let currentlySelected = null;
 
                     constellation.addEventListener('click', (e) => {
-                        const node = e.target.closest('.node-btn') || e.target.closest('.constellation-node');
+                        const node = e.target.closest('.constellation .node-btn') || e.target.closest('.constellation .constellation-node');
                         if (!node) return;
                         e.preventDefault();
 
                         const constellationId = node.getAttribute('data-constellation');
-                        const targetContent = detailsPanel ? detailsPanel.querySelector(`.constellation-content[data-constellation="${constellationId}"]`) : null;
+                        const targetContent = detailsPanel ? detailsPanel.querySelector(`.constellation .constellation-content[data-constellation="${constellationId}"]`) : null;
 
                         // Remove selected state from all nodes
                         constellationNodes.forEach(n => n.classList.remove('selected'));
@@ -169,7 +173,7 @@ export function constellationPlugin(parserInstance) {
             const positions = calculatePositions(nodes.length);
             
             // Generate constellation HTML with exact structure specified
-            let html = `<div class="constellation-container">`;
+            let html = `<div class="constellation frame"><div class="constellation-container">`;
             
             // Generate nodes using exact structure
             for (let i = 0; i < nodes.length; i++) {
@@ -193,7 +197,7 @@ export function constellationPlugin(parserInstance) {
 </div>`;
             }
             
-            html += `</div>`;
+            html += `</div><hr />`;
             
             // Generate details panel
             html += `
@@ -261,7 +265,7 @@ export function constellationPlugin(parserInstance) {
                         </div>`;
             }
             
-            html += `</div>`;
+            html += `</div></div>`;
             
             return {
                 html,

@@ -1,26 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" class="aurora">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#121212">
-    <meta name="description" content="Ben Belikov's personal website, showcasing expertise in DevOps, Team Leadership, System Design, and more. Explore projects, skills, and contact information.">
+    
+{{#headercontent.tpl.html}}
 
-    <!-- Open Graph -->
-    <meta property="og:title" content="Ben Belikov - DevOps, Team Lead">
-    <meta property="og:description" content="Ben Belikov's personal website, showcasing expertise in DevOps, Team Leadership, System Design, and more. Explore projects, skills, and contact information.">
-    <meta property="og:image" content="https://bbelius.dev/img/profile.jpg">
-    <meta property="og:url" content="https://bbelius.dev/">
-    <meta property="og:type" content="website">
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Ben Belikov - DevOps, Team Lead">
-    <meta name="twitter:description" content="Ben Belikov's personal website, showcasing expertise in DevOps, Team Leadership, System Design, and more. Explore projects, skills, and contact information.">
-    <meta name="twitter:image" content="https://bbelius.dev/img/profile.jpg">
-
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://bbelius.dev/">
+{{#styles.tpl.html}}
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -36,29 +23,8 @@
       ]
     }
     </script>
-
-    <link rel="apple-touch-icon" sizes="180x180" href="/img/fav/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/img/fav/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/img/fav/favicon-16x16.png">
-    <link rel="manifest" href="/img/fav/site.webmanifest">
-
-    <title>Blog - bbelius.dev</title>
-
-    <link rel="stylesheet" href="/lib/northlight/aurora.css">
-    <link rel="stylesheet" href="/css/highlight.min.css">
-    <link rel="stylesheet" href="/css/tomorrow-night.css">
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/stl.css">
-    <link rel="stylesheet" href="/css/markdrownXT.css">
-    <link rel="stylesheet" href="/lib/markdrown/plugins/features.css">
-    <link rel="stylesheet" href="/lib/markdrown/plugins/constellation.css">
-
-    <link rel="apple-touch-icon" sizes="180x180" href="/img/fav/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/img/fav/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/img/fav/favicon-16x16.png">
-    <link rel="manifest" href="/img/fav/site.webmanifest">
 </head>
-<body data-page="blog" class="aurora">
+<body data-page="landing">
     <div id="navigation-placeholder"></div>
     
     <!-- Blog Menu -->
@@ -88,8 +54,8 @@
                 <button class="blog-menu-toggle" aria-label="Toggle blog menu">
                     <i data-lucide="menu" class="menu-icon"></i>
                 </button>
-                <span id="word-count">0 words</span>
-                <span id="char-count">0 chars</span>
+                <span data-role="word-count">0 words</span>
+                <span data-role="char-count">0 chars</span>
             </div>
             <div class="tab-buttons">
                 <div class="tab-button" data-tab="source">
@@ -133,9 +99,6 @@
         </footer>
     </main>
 
-    <script src="/js/lucide.min.js"></script>
-    <script src="/js/highlight.min.js"></script>
-    <script type="module" src="/lib/markdrown/markdrown.js"></script>
-    <script type="module" src="/js/main.js"></script>
+{{#scripts.tpl.html}}
 </body>
 </html>

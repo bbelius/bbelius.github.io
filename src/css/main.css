@@ -1,182 +1,13 @@
- /* Font Imports */
-@font-face {
-  font-family: 'Comfortaa';
-  src: url('./fonts/Comfortaa-VariableFont_wght.ttf') format('truetype');
-  font-optical-sizing: auto;
-  font-weight: 300 700;
-  font-style: normal;
-  font-display: swap;
-}
 
-@font-face {
-  font-family: 'Outfit';
-  src: url('./fonts/Outfit-VariableFont_wght.ttf') format('truetype');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SourceCodePro';
-  src: url('./fonts/SourceCodePro-VariableFont_wght.ttf') format('truetype');
-  font-weight: 200 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SourceCodePro';
-  src: url('./fonts/SourceCodePro-Italic-VariableFont_wght.ttf') format('truetype');
-  font-weight: 200 900;
-  font-style: italic;
-  font-display: swap;
-}
-
-/* Color Palette */
-:root {
-  /* Base colors */
-  --background-gradient-accent-1: oklch(0.765 0.151 229.5 / 0.180);
-  --background-gradient-accent-2: oklch(0.598 0.277 320.5 / 0.130);
-  --background-gradient-accent-3: oklch(0.659 0.275 350.0 / 0.110);
-  --background-gradient-start: oklch(0.122 0.000 263.3);
-  --background-gradient-end: oklch(0.226 0.000 263.3);
-  
-  /* Grid overlay */
-  --grid-line-color: oklch(1.000 0.000 263.3 / 0.005);
-  
-  /* Glass morphism colors */
-  --glass-shadow-primary: oklch(0.000 0.000 0.0 / 0.600);
-  --aurora-glass-highlight-top: oklch(1.000 0.000 0.0 / 0.200);
-  --aurora-glass-highlight-accent-1: oklch(1.000 0.000 0.0 / 0.020);
-  --aurora-glass-highlight-accent-2: oklch(1.000 0.000 0.0 / 0.010);
-  
-  /* Header colors */
-  --header-gradient-start: oklch(1.000 0.000 0.0 / 0.050);
-  --header-gradient-end: oklch(1.000 0.000 0.0 / 0.020);
-  --header-border-color: oklch(1.000 0.000 0.0 / 0.080);
-  --header-accent-glow: oklch(0.501 0.400 141.2 / 0.080);
-  
-  /* Footer colors */
-  --footer-gradient-start: oklch(1.000 0.000 0.0 / 0.030);
-  --footer-gradient-end: oklch(1.000 0.000 0.0 / 0.010);
-  --footer-border-color: oklch(1.000 0.000 0.0 / 0.080);
-  --footer-highlight-color: oklch(1.000 0.000 0.0 / 0.150);
-  
-  /* Text colors */
-  --text-secondary: oklch(0.733 0.000 0.0);
-  --text-content: oklch(1.000 0.000 0.0 / 0.850);
-}
-
-body {
-    font-family: 'Comfortaa', 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background:
-        radial-gradient(circle at 20% 80%, var(--background-gradient-accent-1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, var(--background-gradient-accent-2) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, var(--background-gradient-accent-3) 0%, transparent 50%),
-        linear-gradient(135deg, var(--background-gradient-start) 0%, var(--background-gradient-end) 100%);
-    color: var(--aurora-text-color);
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    position: relative;
-    overflow-x: hidden;
-}
-
-@media (dynamic-range: high) {
-    img[src$=".jpg" i],
-    img[src$=".jpeg" i],
-    img[src$=".png" i] {
-        filter: saturate(1.2) contrast(1.1);
-    }
-}
-
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 2px,
-            var(--grid-line-color) 2px,
-            var(--grid-line-color) 4px
-        ),
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            var(--grid-line-color) 2px,
-            var(--grid-line-color) 4px
-        );
-    pointer-events: none;
-    z-index: 1;
-}
-
-a {
-  white-space: nowrap;
-}
-
-.container {
-    max-width: 800px;
-    width: 100%;
-    background: var(--aurora-dark-glass-bg);
-    border-radius: 20px;
-    box-shadow:
-        0 8px 32px var(--glass-shadow-primary),
-        0 0 0 1px var(--aurora-glass-border),
-        inset 0 1px 0 var(--aurora-glass-highlight);
-    overflow: unset;
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    position: relative;
-    z-index: 2;
-    transition: opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg,
-        transparent 0%,
-        var(--aurora-glass-highlight-top) 50%,
-        transparent 100%);
-    z-index: 1;
-}
-
-.container::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-        radial-gradient(circle at 30% 20%, var(--aurora-glass-highlight-accent-1) 0%, transparent 50%),
-        radial-gradient(circle at 70% 80%, var(--aurora-glass-highlight-accent-2) 0%, transparent 50%);
-    pointer-events: none;
-    border-radius: 20px;
-}
 
 header {
     background:
         linear-gradient(135deg,
-            var(--header-gradient-start) 0%,
-            var(--header-gradient-end) 100%);
+            var(--aurora-header-gradient-start) 0%,
+            var(--aurora-header-gradient-end) 100%);
     padding: 40px;
     text-align: center;
-    border-bottom: 1px solid var(--header-border-color);
+    border-bottom: 1px solid var(--aurora-header-border-color);
     position: relative;
     z-index: 2;
     border-radius: 20px 20px 0 0;
@@ -190,7 +21,7 @@ header::before {
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(ellipse at top, var(--header-accent-glow) 0%, transparent 70%);
+        radial-gradient(ellipse at top, var(--aurora-primary-a10) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -214,7 +45,7 @@ h2 {
     margin: 5px 0 0;
     font-weight: 300;
     font-size: 1.2em;
-    color: var(--text-secondary);
+    color: var(--aurora-text-secondary);
 }
 
 h3,
@@ -256,19 +87,19 @@ p {
     line-height: 1.7;
     margin-bottom: 1em;
     margin-top: 0;
-    color: var(--text-content);
+    color: var(--aurora-text-content);
     font-weight: 400;
 }
 
 footer {
     background:
         linear-gradient(135deg,
-            var(--footer-gradient-start) 0%,
-            var(--footer-gradient-end) 100%);
+            var(--aurora-footer-gradient-start) 0%,
+            var(--aurora-footer-gradient-end) 100%);
     text-align: center;
     padding: 20px;
     font-size: 0.9em;
-    border-top: 1px solid var(--footer-border-color);
+    border-top: 1px solid var(--aurora-footer-border-color);
     position: relative;
     z-index: 2;
     border-radius: 0 0 20px 20px;
@@ -283,7 +114,7 @@ footer::before {
     height: 1px;
     background: linear-gradient(90deg,
         transparent 0%,
-        var(--footer-highlight-color) 50%,
+        var(--aurora-footer-highlight-color) 50%,
         transparent 100%);
 }
 
@@ -332,12 +163,6 @@ a:hover::after {
 /* Adjust body padding to account for fixed navigation */
 body {
     padding-top: 100px;
-}
-
-/* Blog page specific body adjustments */
-body[data-page="blog"] {
-    align-items: flex-start;
-    padding-top: 120px;
 }
 
 .menu-post-item h4,

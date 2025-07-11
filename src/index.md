@@ -5,7 +5,7 @@ author: Benjamin Belikov
 date: 2025-06-24
 description: Ben Belikov's personal website, showcasing expertise in DevOps, Team Leadership, System Design, and more. Explore projects, skills, and contact information.
 tags: ["blog", "profile", "portfolio"]
-type: thoughts
+category: thoughts
 ---
 
 ### About Me

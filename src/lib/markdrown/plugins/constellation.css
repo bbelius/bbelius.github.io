@@ -1,10 +1,34 @@
-.constellation-container {
+.constellation.frame {
+    position: relative;
+    border: 1px solid var(--aurora-white-a10);
+    border-radius: 16px;
+    background: linear-gradient(135deg,
+        var(--aurora-white-a6) 0%,
+        var(--aurora-white-a2) 100%);
+    box-shadow: inset 0 1px 0 var(--aurora-white-a5), inset 0 -0.5px 0 rgba(0, 0, 0, 0.03), inset 1px 0 0 var(--aurora-white-a2), inset -0.5px 0 0 rgba(0, 0, 0, 0.015), 0 2px 8px var(--aurora-primary-a5), 0 1px 3px var(--aurora-black-a4), 0 0 0 0.5px var(--aurora-white-a2);
+}
+
+.constellation.frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: radial-gradient(ellipse 250% 100% at 50% 0%, var(--aurora-white-a4) 0%, var(--aurora-white-a2) 50%, transparent 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.constellation.frame hr {
+    margin: 0;
+}
+
+.constellation .constellation-container {
     position: relative;
     height: 500px;
     overflow: hidden;
 }
 
-.node-btn {
+.constellation .node-btn {
     position: absolute;
     transform: translate(-50%, -50%);
     z-index: 2;
@@ -12,11 +36,11 @@
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.node-btn.central {
+.constellation .node-btn.central {
     z-index: 3;
 }
 
-.node-btn .core {
+.constellation .node-btn .core {
     width: 60px;
     height: 60px;
     background: linear-gradient(135deg,
@@ -35,7 +59,7 @@
     overflow: hidden;
 }
 
-.node-btn.central .core {
+.constellation .node-btn.central .core {
     width: 80px;
     height: 80px;
     background: linear-gradient(135deg,
@@ -47,7 +71,7 @@
         inset 0 1px 0 var(--aurora-white-a15);
 }
 
-.node-btn .core::before {
+.constellation .node-btn .core::before {
     content: '';
     position: absolute;
     top: 0;
@@ -60,7 +84,7 @@
     border-radius: 50%;
 }
 
-.node-btn .core svg {
+.constellation .node-btn .core svg {
     color: var(--aurora-primary-a90);
     z-index: 1;
     transition: all 0.3s ease;
@@ -68,7 +92,7 @@
     width: 1.5em;
 }
 
-.node-btn:hover .core {
+.constellation .node-btn:hover .core {
     transform: scale(1.1);
     border-color: var(--aurora-primary-a60);
     box-shadow:
@@ -76,14 +100,14 @@
         inset 0 1px 0 var(--aurora-white-a20);
 }
 
-.node-btn:hover .core svg {
+.constellation .node-btn:hover .core svg {
     color: var(--aurora-primary);
     filter: drop-shadow(0 0 8px var(--aurora-primary-a50));
     height: 1.5em;
     width: 1.5em;
 }
 
-.node-btn.selected .core {
+.constellation .node-btn.selected .core {
     border-color: var(--aurora-primary-a80);
     background: linear-gradient(135deg,
         var(--aurora-primary-a30) 0%,
@@ -93,14 +117,14 @@
         inset 0 1px 0 var(--aurora-white-a20);
 }
 
-.node-btn.selected .core svg {
+.constellation .node-btn.selected .core svg {
     color: var(--aurora-primary);
     filter: drop-shadow(0 0 12px var(--aurora-primary-a60));
     height: 1.5em;
     width: 1.5em;
 }
 
-.node-btn .label {
+.constellation .node-btn .label {
     position: absolute;
     top: 100%;
     left: 50%;
@@ -120,49 +144,34 @@
     padding: 2px;
 }
 
-.tools-header-icon {
+.constellation .tools-header-icon {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
 }
 
-.tools-header-icon svg {
+.constellation .tools-header-icon svg {
     color: var(--aurora-primary-a80);
     filter: drop-shadow(0 0 20px var(--aurora-primary-a30));
 }
 
 /* Tool Details Panel */
-.constellation-details {
+.constellation .constellation-details {
     padding: 24px;
-    background: linear-gradient(135deg,
-        var(--aurora-white-a6) 0%,
-        var(--aurora-white-a2) 100%);
-    border: 1px solid var(--aurora-white-a10);
-    border-radius: 16px;
     transition: all 0.3s ease;
     min-height: 120px;
-    overflow: hidden;
-    box-shadow: inset 0 1px 0 var(--aurora-white-a5), inset 0 -0.5px 0 rgba(0, 0, 0, 0.03), inset 1px 0 0 var(--aurora-white-a2), inset -0.5px 0 0 rgba(0, 0, 0, 0.015), 0 2px 8px var(--aurora-primary-a5), 0 1px 3px var(--aurora-black-a4), 0 0 0 0.5px var(--aurora-white-a2);
+    overflow: hidden;    
+    position: relative;
 }
 
-.constellation-details::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 16px;
-    background: radial-gradient(ellipse 250% 100% at 50% 0%, var(--aurora-white-a4) 0%, var(--aurora-white-a2) 50%, transparent 100%);
-    pointer-events: none;
-    z-index: 1;
-}
-
-.constellation-details .content {
+.constellation .constellation-details .content {
     position: relative;
     width: 100%;
     position: relative;
     min-height: 120px;
 }
 
-.constellation-details .panel-icon {
+.constellation .constellation-details .panel-icon {
     position: absolute;
     left: -80px;
     top: 50%;
@@ -177,27 +186,27 @@
     z-index: 1;
 }
 
-.constellation-details .panel-icon svg {
+.constellation .constellation-details .panel-icon svg {
     width: 180px;
     height: 180px;
     color: var(--aurora-primary-a40);
 }
 
-.constellation-details .panel-icon img {
+.constellation .constellation-details .panel-icon img {
     width: 180px;
     height: 180px;
     border-radius: 50%;
     object-fit: cover;
 }
 
-.constellation-details .panel-text {
+.constellation .constellation-details .panel-text {
     position: relative;
     z-index: 2;
     width: 100%;
     padding-left: 75px;
 }
 
-.constellation-details .panel-text h4 {
+.constellation .constellation-details .panel-text h4 {
     margin: 0 0 12px 0;
     font-size: 1.2em;
     font-weight: 600;
@@ -210,7 +219,7 @@
     background-clip: text;
 }
 
-.constellation-details .panel-text p {
+.constellation .constellation-details .panel-text p {
     margin: 0 0 16px 0;
     color: var(--aurora-white-a80);
     line-height: 1.6;
@@ -219,13 +228,13 @@
     width: 100%;
 }
 
-.constellation-details .stats {
+.constellation .constellation-details .stats {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
 }
 
-.constellation-details .stats .stat-item {
+.constellation .constellation-details .stats .stat-item {
     padding: 6px 12px;
     background: var(--aurora-primary-a10);
     border: 1px solid var(--aurora-primary-a20);

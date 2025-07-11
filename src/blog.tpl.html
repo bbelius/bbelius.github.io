@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" class="aurora">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,7 @@
 
 {{#styles.tpl.html}}
 </head>
-<body data-page="blog" class="aurora">
+<body data-page="blog">
     <div id="navigation-placeholder"></div>
     
     <!-- Blog Menu -->
@@ -44,8 +44,8 @@
                 <button class="blog-menu-toggle" aria-label="Toggle blog menu">
                     <i data-lucide="menu" class="menu-icon"></i>
                 </button>
-                <span id="word-count">0 words</span>
-                <span id="char-count">0 chars</span>
+                <span data-role="word-count">0 words</span>
+                <span data-role="char-count">0 chars</span>
             </div>
             <div class="tab-buttons">
                 <div class="tab-button" data-tab="source">

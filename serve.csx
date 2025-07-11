@@ -10,6 +10,7 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Channels;
 using System.Text.Json;
+using System.Text;
 using YamlDotNet.Serialization;
 
 // ---- Parameter handling ----
@@ -22,11 +23,23 @@ if (!Directory.Exists(rootDir))
 }
 Console.WriteLine($"Serving from: {rootDir}");
 
+// Global variable to store preprocessed files in memory
+Dictionary<string, string> preprocessedFiles = new Dictionary<string, string>();
+
+// ---- Run preprocessing ----
+PreprocessFiles();
+
 // ---- Helper functions ----
 Dictionary<string, object> LoadGlobalVariables()
 {
     var globalVars = new Dictionary<string, object>();
-    var globalYmlPath = Path.Combine(rootDir, "src", "global.yml");
+    
+    // Check if we're in src directory or need to look for src subdirectory
+    var globalYmlPath = Path.Combine(rootDir, "global.yml");
+    if (!File.Exists(globalYmlPath))
+    {
+        globalYmlPath = Path.Combine(rootDir, "src", "global.yml");
+    }
     
     if (File.Exists(globalYmlPath))
     {
@@ -72,6 +85,251 @@ Dictionary<string, object> LoadGlobalVariables()
     }
     
     return globalVars;
+}
+
+List<string> LoadPreprocessFiles()
+{
+    var preprocessFiles = new List<string>();
+    
+    // Check if we're in src directory or need to look for src subdirectory
+    var globalYmlPath = Path.Combine(rootDir, "global.yml");
+    if (!File.Exists(globalYmlPath))
+    {
+        globalYmlPath = Path.Combine(rootDir, "src", "global.yml");
+    }
+    
+    if (File.Exists(globalYmlPath))
+    {
+        try
+        {
+            var yamlContent = File.ReadAllText(globalYmlPath);
+            var deserializer = new DeserializerBuilder().Build();
+            var yamlObject = deserializer.Deserialize<Dictionary<string, object>>(yamlContent);
+            
+            if (yamlObject != null && yamlObject.ContainsKey("preprocess"))
+            {
+                var preprocessSection = yamlObject["preprocess"];
+                if (preprocessSection is List<object> preprocessList)
+                {
+                    foreach (var item in preprocessList)
+                    {
+                        if (item is string filePath)
+                        {
+                            preprocessFiles.Add(filePath);
+                        }
+                    }
+                }
+            }
+            
+            Console.WriteLine($"Loaded {preprocessFiles.Count} files for preprocessing");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading preprocess files from global.yml: {ex.Message}");
+        }
+    }
+    
+    return preprocessFiles;
+}
+
+class MarkdownMetadata
+{
+    public string FilePath { get; set; } = "";
+    public string Title { get; set; } = "";
+    public string Subtitle { get; set; } = "";
+    public string Author { get; set; } = "";
+    public string Date { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Tags { get; set; } = "";
+    public string Type { get; set; } = "";
+    public string Slug { get; set; } = "";
+    public string Category { get; set; } = "";
+}
+
+Dictionary<string, List<MarkdownMetadata>> ScanMarkdownFiles()
+{
+    var filesByTpl = new Dictionary<string, List<MarkdownMetadata>>();
+    
+    // Determine the correct source directory
+    var srcDir = rootDir;
+    if (Directory.Exists(Path.Combine(rootDir, "src")))
+    {
+        srcDir = Path.Combine(rootDir, "src");
+    }
+    
+    if (!Directory.Exists(srcDir))
+    {
+        Console.WriteLine("source directory not found, skipping markdown scan");
+        return filesByTpl;
+    }
+    
+    var mdFiles = Directory.GetFiles(srcDir, "*.md", SearchOption.AllDirectories);
+    
+    foreach (var mdFile in mdFiles)
+    {
+        try
+        {
+            var content = File.ReadAllText(mdFile);
+            var tpl = ParseHeaderValue(content, "tpl");
+            
+            // ONLY process files that use the "blog" template
+            if (tpl != "blog")
+            {
+                Console.WriteLine($"Skipping {Path.GetFileName(mdFile)} (tpl: '{tpl}', not 'blog')");
+                continue;
+            }
+            
+            var metadata = new MarkdownMetadata
+            {
+                FilePath = mdFile,
+                Title = ParseHeaderValue(content, "title") ?? "",
+                Subtitle = ParseHeaderValue(content, "subtitle") ?? "",
+                Author = ParseHeaderValue(content, "author") ?? "",
+                Date = ParseHeaderValue(content, "date") ?? "",
+                Description = ParseHeaderValue(content, "description") ?? "",
+                Tags = ParseHeaderValue(content, "tags") ?? "",
+                Type = ParseHeaderValue(content, "type") ?? "",
+                Category = ParseHeaderValue(content, "category") ?? ""
+            };
+            
+            // Generate slug from file path
+            var relativePath = Path.GetRelativePath(srcDir, mdFile);
+            var slug = relativePath.Replace('\\', '/').Replace(".md", "");
+            if (slug.EndsWith("/index"))
+            {
+                slug = slug.Substring(0, slug.Length - 6); // Remove "/index"
+            }
+            metadata.Slug = slug;
+            
+            // Add to "blog" type for menu processing
+            if (!filesByTpl.ContainsKey("blog"))
+            {
+                filesByTpl["blog"] = new List<MarkdownMetadata>();
+            }
+            filesByTpl["blog"].Add(metadata);
+            
+            Console.WriteLine($"Added {Path.GetFileName(mdFile)} to 'blog' menu (category: '{metadata.Category}', slug: {metadata.Slug})");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error processing {mdFile}: {ex.Message}");
+        }
+    }
+    
+    Console.WriteLine($"Scanned {mdFiles.Length} markdown files, found {filesByTpl.Count} template types");
+    foreach(var kvp in filesByTpl)
+    {
+        Console.WriteLine($"Type '{kvp.Key}': {kvp.Value.Count} files");
+    }
+    
+    return filesByTpl;
+}
+
+string ProcessTypeReplacements(string template, Dictionary<string, List<MarkdownMetadata>> filesByType)
+{
+    Console.WriteLine($"Processing template replacements. Template length: {template.Length}");
+    Console.WriteLine($"Available types: {string.Join(", ", filesByType.Keys)}");
+    
+    // Pattern to match {{::TYPE ... TYPE::}}
+    var pattern = @"\{\{::(\w+)(.*?)\1::\}\}";
+    var regex = new Regex(pattern, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+    
+    var matches = regex.Matches(template);
+    Console.WriteLine($"Found {matches.Count} template replacement patterns");
+    
+    return regex.Replace(template, match =>
+    {
+        var typeName = match.Groups[1].Value;
+        var innerTemplate = match.Groups[2].Value;
+        
+        Console.WriteLine($"Processing type: '{typeName}', inner template length: {innerTemplate.Length}");
+        
+        // FIX: If template asks for "blog", collect ALL files regardless of their type
+        List<MarkdownMetadata> files = new List<MarkdownMetadata>();
+        
+        if (typeName.ToLower() == "blog")
+        {
+            // Collect ALL markdown files regardless of type
+            foreach (var typeGroup in filesByType.Values)
+            {
+                files.AddRange(typeGroup);
+            }
+            Console.WriteLine($"Blog template: using all {files.Count} files");
+        }
+        else if (filesByType.ContainsKey(typeName))
+        {
+            files = filesByType[typeName];
+            Console.WriteLine($"Found {files.Count} files for type '{typeName}'");
+        }
+        else
+        {
+            Console.WriteLine($"No files found for type: {typeName}");
+            return "";
+        }
+        
+        var result = new StringBuilder();
+        
+        foreach (var file in files)
+        {
+            Console.WriteLine($"Processing file: {file.Title} (slug: {file.Slug})");
+            
+            var processedTemplate = innerTemplate
+                .Replace("{{title}}", file.Title)
+                .Replace("{{subtitle}}", file.Subtitle)
+                .Replace("{{author}}", file.Author)
+                .Replace("{{date}}", file.Date)
+                .Replace("{{description}}", file.Description)
+                .Replace("{{tags}}", file.Tags)
+                .Replace("{{type}}", file.Type)
+                .Replace("{{slug}}", file.Slug)
+                .Replace("{{category}}", file.Category);
+            
+            result.Append(processedTemplate);
+        }
+        
+        Console.WriteLine($"Generated result length: {result.Length}");
+        return result.ToString();
+    });
+}
+
+void PreprocessFiles()
+{
+    var preprocessFiles = LoadPreprocessFiles();
+    var filesByTpl = ScanMarkdownFiles();
+    
+    foreach (var preprocessFile in preprocessFiles)
+    {
+        try
+        {
+            // Check if we're in src directory or need to look for src subdirectory
+            var templatePath = Path.Combine(rootDir, preprocessFile);
+            if (!File.Exists(templatePath))
+            {
+                templatePath = Path.Combine(rootDir, "src", preprocessFile);
+            }
+            
+            if (!File.Exists(templatePath))
+            {
+                Console.WriteLine($"Template file not found: {templatePath}");
+                continue;
+            }
+            
+            var template = File.ReadAllText(templatePath);
+            var processed = ProcessTypeReplacements(template, filesByTpl);
+            
+            // Generate output file path (remove .tpl from filename)
+            var outputFileName = preprocessFile.Replace(".tpl.html", ".html");
+            var virtualPath = "/" + outputFileName;
+            
+            // Store in memory instead of writing to disk
+            preprocessedFiles[virtualPath] = processed;
+            Console.WriteLine($"Preprocessed {preprocessFile} -> {outputFileName} (stored in memory)");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error preprocessing {preprocessFile}: {ex.Message}");
+        }
+    }
 }
 
 string ParseHeaderValue(string text, string key)
@@ -272,7 +530,16 @@ app.Use(async (context, next) =>
         }
     }
 
-    // 4. Serve .html files as static, unmodified (but not .tpl.html)
+    // 4. Check for preprocessed files in memory first
+    if (preprocessedFiles.ContainsKey(reqPath))
+    {
+        var html = preprocessedFiles[reqPath];
+        context.Response.ContentType = "text/html";
+        await context.Response.WriteAsync(InjectReloadOverlay(html));
+        return;
+    }
+
+    // 5. Serve .html files as static, unmodified (but not .tpl.html)
     if (reqPath.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
     {
         var htmlPath = Path.Combine(rootDir, reqPath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
@@ -404,26 +671,28 @@ string ProcessAdvancedReplacements(string template, string markdownRaw)
         if (string.IsNullOrEmpty(fieldValue))
             return "";
         
-        // Try to parse as JSON array
+        // Try to parse as JSON array, otherwise treat as comma-separated
         try
         {
-            var jsonArray = JsonSerializer.Deserialize<string[]>(fieldValue);
-            if (jsonArray != null)
+            if (fieldValue.Trim().StartsWith("["))
             {
-                return string.Join("", jsonArray.Select(item => 
-                    itemTemplate.Replace("$", item)));
+                var jsonArray = JsonSerializer.Deserialize<string[]>(fieldValue);
+                if (jsonArray != null)
+                {
+                    return string.Join("", jsonArray.Select(item =>
+                        itemTemplate.Replace("$", item)));
+                }
             }
         }
-        catch
-        {
-            // If not valid JSON, try to parse as comma-separated values
-            var items = fieldValue.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                                 .Select(x => x.Trim())
-                                 .Where(x => !string.IsNullOrEmpty(x));
-            
-            return string.Join("", items.Select(item => 
-                itemTemplate.Replace("$", item)));
-        }
+        catch (JsonException) { /* Fall through to comma-separated parsing */ }
+
+        // Fallback to comma-separated values
+        var items = fieldValue.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                .Select(x => x.Trim())
+                                .Where(x => !string.IsNullOrEmpty(x));
+        
+        return string.Join("", items.Select(item =>
+            itemTemplate.Replace("$", item)));
         
         return "";
     });
