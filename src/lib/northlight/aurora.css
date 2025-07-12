@@ -259,7 +259,7 @@
         linear-gradient(135deg, var(--aurora-bg-grad-start) 0%, var(--aurora-bg-grad-end) 100%);
     color: var(--aurora-text-color);
     margin: 0;
-    padding-top: 120px;
+    padding-top: 100px;
     padding-bottom: 40px;
     display: flex;
     justify-content: center;
@@ -273,7 +273,7 @@
     .aurora img[src$=".jpg" i],
     .aurora img[src$=".jpeg" i],
     .aurora img[src$=".png" i] {
-        filter: saturate(1.2) contrast(1.1);
+        filter: saturate(1.1) contrast(1.05);
     }
 }
 

@@ -320,6 +320,7 @@ export class Markdrown {
         this.addPlugin(strikethroughPlugin());
         this.addPlugin(linebreakPlugin());
         this.addPlugin(htmlPassthroughPlugin());
+        this.addPlugin(anchorLinkPlugin());
     }
 }
 
@@ -456,7 +457,7 @@ function imagePlugin() {
                 (m, alt, src, desc, link) => {
                     let imgHtml = desc
                         ? `<figure><img src="${Markdrown.escapeHTML(src)}" alt="${Markdrown.escapeHTML(alt)}"><figcaption>${Markdrown.escapeHTML(desc)}</figcaption></figure>`
-                        : `<img src="${Markdrown.escapeHTML(src)}" alt="${Markdrown.escapeHTML(alt)}">`;
+                        : `<figure><img src="${Markdrown.escapeHTML(src)}" alt="${Markdrown.escapeHTML(alt)}"></figure>`;
                     return `<a href="${Markdrown.escapeHTML(link)}">${imgHtml}</a>`;
                 }
             );
@@ -468,7 +469,7 @@ function imagePlugin() {
                     if (desc) {
                         return `<figure><img src="${Markdrown.escapeHTML(src)}" alt="${Markdrown.escapeHTML(alt)}"><figcaption>${Markdrown.escapeHTML(desc)}</figcaption></figure>`;
                     } else {
-                        return `<img src="${Markdrown.escapeHTML(src)}" alt="${Markdrown.escapeHTML(alt)}">`;
+                        return `<figure><img src="${Markdrown.escapeHTML(src)}" alt="${Markdrown.escapeHTML(alt)}"></figure>`;
                     }
                 }
             );
@@ -479,7 +480,7 @@ function imagePlugin() {
 
 function nestedListPlugin() {
     // Recognizes bullet/number/alpha lists and their indentation
-    const listRegex = /^(\s*)([*+-]|\d+\.\s?|[a-zA-Z]\.\s?)(\s+)(.+)$/;
+    const listRegex = /^(\s*)([*+-]|\d+\.|[a-zA-Z]\.)(\s+)(.+)$/;
 
     function parseList(lines, start, inline, baseIndent = 0) {
         let items = [];
@@ -495,7 +496,7 @@ function nestedListPlugin() {
         }
         function getOlType(marker) {
             if (/^[a-z]\.$/.test(marker)) return 'a';
-            if (/^[A]\.$/.test(marker)) return 'A';
+            if (/^[A-Z]\.$/.test(marker)) return 'A';
             return null;
         }
 
@@ -911,6 +912,97 @@ function htmlPassthroughPlugin() {
                 html: htmlLines.join('\n'),
                 linesUsed: j - i
             };
+        }
+    };
+}
+
+/**
+ * Anchor Link Plugin for Markdrown
+ * Adds clickable anchor links to h3 and h4 headings
+ */
+function anchorLinkPlugin() {
+    return {
+        type: 'block',
+        priority: 1000, // Very low priority - run after all other plugins to modify existing headings
+        parse: () => {
+            // This plugin doesn't parse markdown, it only does post-render DOM manipulation
+            return null;
+        },
+        postRender: (registerCallback) => {
+            registerCallback((container) => {
+                if (!container) return;
+                
+                try {
+                    // Find all h3 and h4 elements with IDs
+                    const headings = container.querySelectorAll('h3[id], h4[id]');
+                
+                headings.forEach(heading => {
+                    // Skip if already has anchor link
+                    if (heading.querySelector('.anchor-link')) return;
+                    
+                    // Create anchor link button
+                    const anchorLink = document.createElement('button');
+                    anchorLink.className = 'anchor-link';
+                    anchorLink.innerHTML = '<i data-lucide="link"></i>';
+                    anchorLink.setAttribute('aria-label', 'Copy link to this section');
+                    anchorLink.setAttribute('title', 'Copy link to this section');
+                    
+                    // Add click handler
+                    anchorLink.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        
+                        try {
+                            // Get current URL with anchor
+                            const url = new URL(window.location);
+                            url.hash = '#' + heading.id;
+                            
+                            // Copy to clipboard
+                            await navigator.clipboard.writeText(url.toString());
+                            
+                            // Visual feedback - turn green briefly
+                            anchorLink.classList.add('copied');
+                            setTimeout(() => {
+                                anchorLink.classList.remove('copied');
+                            }, 2000);
+                            
+                        } catch (err) {
+                            console.warn('Failed to copy link:', err);
+                            // Fallback for older browsers using deprecated execCommand
+                            try {
+                                const textArea = document.createElement('textarea');
+                                const url = new URL(window.location);
+                                url.hash = '#' + heading.id;
+                                textArea.value = url.toString();
+                                document.body.appendChild(textArea);
+                                textArea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(textArea);
+                                
+                                // Visual feedback
+                                anchorLink.classList.add('copied');
+                                setTimeout(() => {
+                                    anchorLink.classList.remove('copied');
+                                }, 2000);
+                            } catch (fallbackErr) {
+                                console.warn('Copy fallback also failed:', fallbackErr);
+                            }
+                        }
+                    });
+                    
+                    // Add a space before the anchor link
+                    heading.appendChild(document.createTextNode(' '));
+                    // Add anchor link after the heading text
+                    heading.appendChild(anchorLink);
+                });
+                
+                // Let the existing Lucide initialization handle the icons
+                // No need to call lucide.createIcons() here as it's handled elsewhere
+                } catch (error) {
+                    console.warn('Anchor link plugin error:', error);
+                }
+            });
         }
     };
 }

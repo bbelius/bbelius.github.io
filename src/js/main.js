@@ -139,6 +139,39 @@ function initializeProfileImageSwitching() {
     profileContainer.style.cursor = 'pointer';
 }
 
+function setupExternalLinks() {
+    // Find all links on the page
+    const links = document.querySelectorAll('a[href]');
+    
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        
+        // Check if it's an external link
+        if (href && (
+            href.startsWith('http://') || 
+            href.startsWith('https://') ||
+            href.startsWith('//') ||
+            (href.includes('://') && !href.startsWith('mailto:') && !href.startsWith('tel:'))
+        )) {
+            // Don't modify links that are already on the same domain
+            try {
+                const linkUrl = new URL(href, window.location.origin);
+                if (linkUrl.hostname === window.location.hostname) {
+                    return; // Skip internal links
+                }
+            } catch (e) {
+                // If URL parsing fails, treat as external
+            }
+            
+            // Set target="_blank" and security attributes
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
+            
+            console.log(`Set external link: ${href}`);
+        }
+    });
+}
+
 // === NAVIGATION ===
 async function loadNavigation() {
     try {
@@ -179,6 +212,36 @@ function initializeNavigation() {
             link.classList.add('active');
         }
     });
+}
+
+// === URL QUERY PARAM FOR BLOG TITLES ===
+function addTitleQueryParam() {
+    // Only process blog URLs
+    if (!window.location.pathname.startsWith('/blog')) {
+        return;
+    }
+    
+    // Try to find the title from the rendered content
+    const titleElement = document.querySelector('.markdrown-content h1') || 
+                       document.querySelector('#markdrown-output h1') ||
+                       document.querySelector('.blog-post-header h1') ||
+                       document.querySelector('h1');
+    
+    if (titleElement) {
+        const title = titleElement.textContent.trim();
+        // Replace non-safe characters with underscore
+        const safeTitle = title.replace(/[^a-zA-Z0-9-]/g, '_');
+        
+        // Check if query param already exists
+        const currentParams = new URLSearchParams(window.location.search);
+        if (!currentParams.has('t') || currentParams.get('t') !== safeTitle) {
+            currentParams.set('t', safeTitle);
+            
+            // Update URL without navigation
+            const newUrl = window.location.pathname + '?' + currentParams.toString();
+            window.history.replaceState({}, '', newUrl);
+        }
+    }
 }
 
 // === BLOG FUNCTIONALITY ===
@@ -317,6 +380,12 @@ function render() {
         
         addCopyButtonsToCodeBlocks();
         
+        // ADD THIS LINE - Setup external links after rendering
+        setupExternalLinks();
+        
+        // Add title query param for blog posts
+        addTitleQueryParam();
+        
         if (window.lucide) lucide.createIcons();
         
         isRendering = false;
@@ -424,10 +493,9 @@ function setupMenuEventListeners() {
     const categoryFilters = document.querySelectorAll('.category-filter');
     const postItems = document.querySelectorAll('.menu-post-item');
     
-    if (!menuToggle || !menuOverlay || !menuBackdrop) return;
+    if (!menuOverlay || !menuBackdrop) return;
     
-    // Toggle menu
-    menuToggle.addEventListener('click', toggleMenu);
+    // Note: Menu toggle event listeners are handled by setupBasicEventListeners()
     
     // Close menu
     if (menuCloseBtn) {
@@ -461,14 +529,7 @@ function setupMenuEventListeners() {
             hoverTimeout = setTimeout(hideMenuOnHover, 300);
         });
         
-        document.addEventListener('mousemove', (e) => {
-            if (e.clientX <= 10) {
-                clearTimeout(hoverTimeout);
-                showMenuOnHover();
-            } else if (e.clientX > 400 && !menuOverlay.matches(':hover')) {
-                hoverTimeout = setTimeout(hideMenuOnHover, 500);
-            }
-        });
+        // Note: Mouse move detection removed - using dedicated hover trigger area instead
     }
     
     // Search functionality
@@ -518,9 +579,12 @@ function setupMenuEventListeners() {
 
 function toggleMenu() {
     const menuOverlay = document.getElementById('blog-menu-overlay');
-    if (menuOverlay.classList.contains('active')) {
+    console.log('toggleMenu called, menuOverlay:', menuOverlay);
+    if (menuOverlay && menuOverlay.classList.contains('active')) {
+        console.log('Closing menu');
         closeMenu();
     } else {
+        console.log('Opening menu');
         openMenu();
     }
 }
@@ -528,13 +592,13 @@ function toggleMenu() {
 function openMenu() {
     const menuOverlay = document.getElementById('blog-menu-overlay');
     const menuBackdrop = document.getElementById('blog-menu-backdrop');
-    const menuToggle = document.querySelector('.blog-menu-toggle');
+    const menuToggles = document.querySelectorAll('.blog-menu-toggle');
     const menuIndicator = document.getElementById('blog-menu-indicator');
     
-    if (menuOverlay && menuBackdrop && menuToggle) {
+    if (menuOverlay && menuBackdrop && menuToggles.length > 0) {
         menuOverlay.classList.add('active');
         menuBackdrop.classList.add('active');
-        menuToggle.classList.add('active');
+        menuToggles.forEach(toggle => toggle.classList.add('active'));
         
         if (menuIndicator) {
             menuIndicator.style.opacity = '0';
@@ -549,13 +613,13 @@ function openMenu() {
 function closeMenu() {
     const menuOverlay = document.getElementById('blog-menu-overlay');
     const menuBackdrop = document.getElementById('blog-menu-backdrop');
-    const menuToggle = document.querySelector('.blog-menu-toggle');
+    const menuToggles = document.querySelectorAll('.blog-menu-toggle');
     const menuIndicator = document.getElementById('blog-menu-indicator');
     
-    if (menuOverlay && menuBackdrop && menuToggle) {
+    if (menuOverlay && menuBackdrop && menuToggles.length > 0) {
         menuOverlay.classList.remove('active', 'hover-active');
         menuBackdrop.classList.remove('active');
-        menuToggle.classList.remove('active');
+        menuToggles.forEach(toggle => toggle.classList.remove('active'));
         
         if (menuIndicator) {
             menuIndicator.style.opacity = '';
@@ -711,7 +775,7 @@ function addCopyButtonsToCodeBlocks() {
         copyBtn.setAttribute('aria-label', 'Copy code to clipboard');
         copyBtn.innerHTML = `
             <i data-lucide="copy" class="copy-icon"></i>
-            <span class="copy-text">Copy</span>
+            <!-- <span class="copy-text"></span>-->
         `;
         
         copyBtn.addEventListener('click', async () => {
@@ -787,24 +851,24 @@ async function copyToClipboardFallback(text) {
 }
 
 async function updateCopyButtonState(copyBtn, state) {
-    const textSpan = copyBtn.querySelector('.copy-text');
+    //const textSpan = copyBtn.querySelector('.copy-text');
     const icon = copyBtn.querySelector('.copy-icon');
     
     switch (state) {
         case 'success':
             copyBtn.classList.add('copied');
-            textSpan.textContent = 'Copied!';
+            //textSpan.textContent = 'Copied!';
             icon.setAttribute('data-lucide', 'check');
             break;
         case 'error':
             copyBtn.classList.add('error');
-            textSpan.textContent = 'Error';
+            //textSpan.textContent = 'Error';
             icon.setAttribute('data-lucide', 'x');
             break;
         case 'default':
         default:
             copyBtn.classList.remove('copied', 'error');
-            textSpan.textContent = 'Copy';
+            //textSpan.textContent = '';
             icon.setAttribute('data-lucide', 'copy');
             break;
     }
@@ -904,6 +968,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadNavigation();
 
     setupTagClickHandlers();
+    setupExternalLinks();
     
     // Initialize icons
     if (window.lucide) lucide.createIcons();

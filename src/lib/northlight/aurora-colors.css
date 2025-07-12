@@ -83,13 +83,31 @@
 
   /* Additional Colors */
   --aurora-green: oklch(0.723 0.192 149.6);
+  --aurora-green-a1: oklch(0.723 0.192 149.6 / 0.01);
   --aurora-green-a2: oklch(0.723 0.192 149.6 / 0.02);
+  --aurora-green-a3: oklch(0.723 0.192 149.6 / 0.03);
+  --aurora-green-a4: oklch(0.723 0.192 149.6 / 0.04);
   --aurora-green-a5: oklch(0.723 0.192 149.6 / 0.05);
   --aurora-green-a8: oklch(0.723 0.192 149.6 / 0.08);
-  --aurora-green-a10: oklch(0.723 0.192 149.6 / 0.1);
+  --aurora-green-a10: oklch(0.723 0.192 149.6 / 0.10);
   --aurora-green-a15: oklch(0.723 0.192 149.6 / 0.15);
-  --aurora-green-a30: oklch(0.723 0.192 149.6 / 0.3);
-  --aurora-green-a80: oklch(0.723 0.192 149.6 / 0.8);
+  --aurora-green-a20: oklch(0.723 0.192 149.6 / 0.20);
+  --aurora-green-a25: oklch(0.723 0.192 149.6 / 0.25);
+  --aurora-green-a30: oklch(0.723 0.192 149.6 / 0.30);
+  --aurora-green-a35: oklch(0.723 0.192 149.6 / 0.35);
+  --aurora-green-a40: oklch(0.723 0.192 149.6 / 0.40);
+  --aurora-green-a45: oklch(0.723 0.192 149.6 / 0.45);
+  --aurora-green-a50: oklch(0.723 0.192 149.6 / 0.50);
+  --aurora-green-a55: oklch(0.723 0.192 149.6 / 0.55);
+  --aurora-green-a60: oklch(0.723 0.192 149.6 / 0.60);
+  --aurora-green-a65: oklch(0.723 0.192 149.6 / 0.65);
+  --aurora-green-a70: oklch(0.723 0.192 149.6 / 0.70);
+  --aurora-green-a75: oklch(0.723 0.192 149.6 / 0.75);
+  --aurora-green-a80: oklch(0.723 0.192 149.6 / 0.80);
+  --aurora-green-a85: oklch(0.723 0.192 149.6 / 0.85);
+  --aurora-green-a90: oklch(0.723 0.192 149.6 / 0.90);
+  --aurora-green-a95: oklch(0.723 0.192 149.6 / 0.95);
+  --aurora-green-a100: oklch(0.723 0.192 149.6 / 1.00);
 
   --aurora-yellow: oklch(0.837 0.164 84.4);
   --aurora-yellow-a2: oklch(0.837 0.164 84.4 / 0.02);

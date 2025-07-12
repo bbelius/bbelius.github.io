@@ -24,10 +24,6 @@ Final touches were made by hand mostly because it was faster than writing anothe
 / Simple, but Limitless
   Built using only HTML, CSS, and JavaScript without any external libraries or frameworks.
 
-* spa | app-window | SPA Experience
-/ Smooth Experience
-  Single Page Application (SPA) experience with smooth transitions and no full page reloads.
-
 * design | paintbrush | Modern Design
 / Modern, Sleek, Beautiful
   Designed with a modern aesthetic, focusing on usability and visual appeal.

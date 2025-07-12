@@ -1,4 +1,6 @@
-
+html {
+    scroll-padding-top: 150px;
+}
 
 header {
     background:

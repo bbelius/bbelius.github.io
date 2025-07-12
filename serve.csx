@@ -5,12 +5,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Channels;
 using System.Text.Json;
 using System.Text;
+using System.Linq;
 using YamlDotNet.Serialization;
 
 // ---- Parameter handling ----
@@ -18,19 +21,19 @@ string rootDir = Args.Count > 0 ? Path.GetFullPath(Args[0]) : Directory.GetCurre
 
 if (!Directory.Exists(rootDir))
 {
-    Console.WriteLine($"Directory '{rootDir}' does not exist.");
+    // Can't use logger yet, so use Console for this critical error
+    Console.Error.WriteLine($"Directory '{rootDir}' does not exist.");
     return;
 }
-Console.WriteLine($"Serving from: {rootDir}");
 
 // Global variable to store preprocessed files in memory
 Dictionary<string, string> preprocessedFiles = new Dictionary<string, string>();
 
-// ---- Run preprocessing ----
-PreprocessFiles();
+// Note: PreprocessFiles needs to be called after logger is available
+// Will be called after app is built
 
 // ---- Helper functions ----
-Dictionary<string, object> LoadGlobalVariables()
+Dictionary<string, object> LoadGlobalVariables(ILogger logger)
 {
     var globalVars = new Dictionary<string, object>();
     
@@ -76,18 +79,18 @@ Dictionary<string, object> LoadGlobalVariables()
                 }
             }
             
-            Console.WriteLine($"Loaded {globalVars.Count} global variables from global.yml");
+            logger.LogInformation("Loaded {Count} global variables from global.yml", globalVars.Count);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading global.yml: {ex.Message}");
+            logger.LogError(ex, "Error loading global.yml");
         }
     }
     
     return globalVars;
 }
 
-List<string> LoadPreprocessFiles()
+List<string> LoadPreprocessFiles(ILogger logger)
 {
     var preprocessFiles = new List<string>();
     
@@ -121,11 +124,11 @@ List<string> LoadPreprocessFiles()
                 }
             }
             
-            Console.WriteLine($"Loaded {preprocessFiles.Count} files for preprocessing");
+            logger.LogInformation("Loaded {Count} files for preprocessing", preprocessFiles.Count);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading preprocess files from global.yml: {ex.Message}");
+            logger.LogError(ex, "Error loading preprocess files from global.yml");
         }
     }
     
@@ -146,7 +149,7 @@ class MarkdownMetadata
     public string Category { get; set; } = "";
 }
 
-Dictionary<string, List<MarkdownMetadata>> ScanMarkdownFiles()
+Dictionary<string, List<MarkdownMetadata>> ScanMarkdownFiles(ILogger logger)
 {
     var filesByTpl = new Dictionary<string, List<MarkdownMetadata>>();
     
@@ -159,7 +162,7 @@ Dictionary<string, List<MarkdownMetadata>> ScanMarkdownFiles()
     
     if (!Directory.Exists(srcDir))
     {
-        Console.WriteLine("source directory not found, skipping markdown scan");
+        logger.LogWarning("Source directory not found, skipping markdown scan");
         return filesByTpl;
     }
     
@@ -175,7 +178,7 @@ Dictionary<string, List<MarkdownMetadata>> ScanMarkdownFiles()
             // ONLY process files that use the "blog" template
             if (tpl != "blog")
             {
-                Console.WriteLine($"Skipping {Path.GetFileName(mdFile)} (tpl: '{tpl}', not 'blog')");
+                logger.LogDebug("Skipping {FileName} (tpl: '{Tpl}', not 'blog')", Path.GetFileName(mdFile), tpl);
                 continue;
             }
             
@@ -208,41 +211,41 @@ Dictionary<string, List<MarkdownMetadata>> ScanMarkdownFiles()
             }
             filesByTpl["blog"].Add(metadata);
             
-            Console.WriteLine($"Added {Path.GetFileName(mdFile)} to 'blog' menu (category: '{metadata.Category}', slug: {metadata.Slug})");
+            logger.LogInformation("Added {FileName} to 'blog' menu (category: '{Category}', slug: {Slug})", Path.GetFileName(mdFile), metadata.Category, metadata.Slug);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error processing {mdFile}: {ex.Message}");
+            logger.LogError(ex, "Error processing {File}", mdFile);
         }
     }
     
-    Console.WriteLine($"Scanned {mdFiles.Length} markdown files, found {filesByTpl.Count} template types");
+    logger.LogInformation("Scanned {FileCount} markdown files, found {TypeCount} template types", mdFiles.Length, filesByTpl.Count);
     foreach(var kvp in filesByTpl)
     {
-        Console.WriteLine($"Type '{kvp.Key}': {kvp.Value.Count} files");
+        logger.LogInformation("Type '{Type}': {FileCount} files", kvp.Key, kvp.Value.Count);
     }
     
     return filesByTpl;
 }
 
-string ProcessTypeReplacements(string template, Dictionary<string, List<MarkdownMetadata>> filesByType)
+string ProcessTypeReplacements(string template, Dictionary<string, List<MarkdownMetadata>> filesByType, ILogger logger)
 {
-    Console.WriteLine($"Processing template replacements. Template length: {template.Length}");
-    Console.WriteLine($"Available types: {string.Join(", ", filesByType.Keys)}");
+    logger.LogDebug("Processing template replacements. Template length: {Length}", template.Length);
+    logger.LogDebug("Available types: {Types}", string.Join(", ", filesByType.Keys));
     
     // Pattern to match {{::TYPE ... TYPE::}}
     var pattern = @"\{\{::(\w+)(.*?)\1::\}\}";
     var regex = new Regex(pattern, RegexOptions.Singleline | RegexOptions.IgnoreCase);
     
     var matches = regex.Matches(template);
-    Console.WriteLine($"Found {matches.Count} template replacement patterns");
+    logger.LogDebug("Found {Count} template replacement patterns", matches.Count);
     
     return regex.Replace(template, match =>
     {
         var typeName = match.Groups[1].Value;
         var innerTemplate = match.Groups[2].Value;
         
-        Console.WriteLine($"Processing type: '{typeName}', inner template length: {innerTemplate.Length}");
+        logger.LogDebug("Processing type: '{Type}', inner template length: {Length}", typeName, innerTemplate.Length);
         
         // FIX: If template asks for "blog", collect ALL files regardless of their type
         List<MarkdownMetadata> files = new List<MarkdownMetadata>();
@@ -254,24 +257,38 @@ string ProcessTypeReplacements(string template, Dictionary<string, List<Markdown
             {
                 files.AddRange(typeGroup);
             }
-            Console.WriteLine($"Blog template: using all {files.Count} files");
+            logger.LogDebug("Blog template: using all {Count} files", files.Count);
         }
         else if (filesByType.ContainsKey(typeName))
         {
             files = filesByType[typeName];
-            Console.WriteLine($"Found {files.Count} files for type '{typeName}'");
+            logger.LogDebug("Found {Count} files for type '{Type}'", files.Count, typeName);
         }
         else
         {
-            Console.WriteLine($"No files found for type: {typeName}");
+            logger.LogWarning("No files found for type: {Type}", typeName);
             return "";
         }
         
         var result = new StringBuilder();
         
-        foreach (var file in files)
+        // Sort files by date (newest first) before processing
+        var sortedFiles = files.OrderByDescending(f => 
         {
-            Console.WriteLine($"Processing file: {file.Title} (slug: {file.Slug})");
+            // Try to parse the date string to ensure proper date sorting
+            if (DateTime.TryParse(f.Date, out DateTime parsedDate))
+            {
+                return parsedDate;
+            }
+            // If date parsing fails, use a default old date
+            return DateTime.MinValue;
+        }).ToList();
+        
+        logger.LogDebug("Sorted {Count} files by date (newest first)", sortedFiles.Count);
+        
+        foreach (var file in sortedFiles)
+        {
+            logger.LogDebug("Processing file: {Title} (date: {Date}, slug: {Slug})", file.Title, file.Date, file.Slug);
             
             var processedTemplate = innerTemplate
                 .Replace("{{title}}", file.Title)
@@ -287,15 +304,15 @@ string ProcessTypeReplacements(string template, Dictionary<string, List<Markdown
             result.Append(processedTemplate);
         }
         
-        Console.WriteLine($"Generated result length: {result.Length}");
+        logger.LogDebug("Generated result length: {Length}", result.Length);
         return result.ToString();
     });
 }
 
-void PreprocessFiles()
+void PreprocessFiles(ILogger logger)
 {
-    var preprocessFiles = LoadPreprocessFiles();
-    var filesByTpl = ScanMarkdownFiles();
+    var preprocessFiles = LoadPreprocessFiles(logger);
+    var filesByTpl = ScanMarkdownFiles(logger);
     
     foreach (var preprocessFile in preprocessFiles)
     {
@@ -310,12 +327,12 @@ void PreprocessFiles()
             
             if (!File.Exists(templatePath))
             {
-                Console.WriteLine($"Template file not found: {templatePath}");
+                logger.LogWarning("Template file not found: {Path}", templatePath);
                 continue;
             }
             
             var template = File.ReadAllText(templatePath);
-            var processed = ProcessTypeReplacements(template, filesByTpl);
+            var processed = ProcessTypeReplacements(template, filesByTpl, logger);
             
             // Generate output file path (remove .tpl from filename)
             var outputFileName = preprocessFile.Replace(".tpl.html", ".html");
@@ -323,11 +340,11 @@ void PreprocessFiles()
             
             // Store in memory instead of writing to disk
             preprocessedFiles[virtualPath] = processed;
-            Console.WriteLine($"Preprocessed {preprocessFile} -> {outputFileName} (stored in memory)");
+            logger.LogInformation("Preprocessed {Source} -> {Target} (stored in memory)", preprocessFile, outputFileName);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error preprocessing {preprocessFile}: {ex.Message}");
+            logger.LogError(ex, "Error preprocessing {File}", preprocessFile);
         }
     }
 }
@@ -388,27 +405,57 @@ string GenerateCanonicalUrl(string mdPath, string baseUrl, string customCanonica
 string InjectReloadOverlay(string html)
 {
     const string overlayScript = @"<script>(function(){
-    var ws = new WebSocket('ws://' + location.host + '/__reload_ws');
-    var updated = false;
     var overlay;
-    ws.onmessage = function() {
-        if(updated) return;
-        updated = true;
-        overlay = document.createElement('div');
-        overlay.style.position = 'fixed';
-        overlay.style.top = '1rem';
-        overlay.style.right = '1rem';
-        overlay.style.zIndex = '99999';
-        overlay.style.background = 'rgba(30,30,30,0.9)';
-        overlay.style.color = '#fff';
-        overlay.style.fontFamily = 'sans-serif';
-        overlay.style.padding = '0.5rem 1rem';
-        overlay.style.borderRadius = '0.5rem';
-        overlay.style.cursor = 'pointer';
-        overlay.textContent = 'Site updated. Click to reload.';
-        overlay.onclick = function() { location.reload(); };
-        document.body.appendChild(overlay);
-    };
+    var reconnectInterval;
+    
+    function connect() {
+        var ws = new WebSocket('ws://' + location.host + '/__reload_ws');
+        
+        ws.onopen = function() {
+            // Clear any reconnect interval when connected
+            if (reconnectInterval) {
+                clearInterval(reconnectInterval);
+                reconnectInterval = null;
+            }
+        };
+        
+        ws.onmessage = function() {
+            // Remove any existing overlay
+            if (overlay && overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+            }
+            
+            overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '1rem';
+            overlay.style.right = '1rem';
+            overlay.style.zIndex = '99999';
+            overlay.style.background = 'rgba(30,30,30,0.9)';
+            overlay.style.color = '#fff';
+            overlay.style.fontFamily = 'sans-serif';
+            overlay.style.padding = '0.5rem 1rem';
+            overlay.style.borderRadius = '0.5rem';
+            overlay.style.cursor = 'pointer';
+            overlay.textContent = 'Site updated. Click to reload.';
+            overlay.onclick = function() { location.reload(); };
+            document.body.appendChild(overlay);
+        };
+        
+        ws.onclose = function() {
+            // Reconnect after 1 second if connection is lost
+            if (!reconnectInterval) {
+                reconnectInterval = setInterval(function() {
+                    connect();
+                }, 1000);
+            }
+        };
+        
+        ws.onerror = function() {
+            ws.close();
+        };
+    }
+    
+    connect();
 })();</script>";
     if (html.Contains("</body>"))
         return html.Replace("</body>", overlayScript + "</body>");
@@ -418,7 +465,25 @@ string InjectReloadOverlay(string html)
 
 // ---- App and reload machinery ----
 var builder = WebApplication.CreateBuilder();
+
+// Configure logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+
 var app = builder.Build();
+var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Server");
+
+// Now that logger is available, run preprocessing
+PreprocessFiles(logger);
+
+// Create cancellation token for graceful shutdown
+var cts = new CancellationTokenSource();
+Console.CancelKeyPress += (sender, e) => {
+    logger.LogInformation("Shutting down gracefully...");
+    e.Cancel = true;
+    cts.Cancel();
+};
 
 app.UseWebSockets();
 
@@ -430,16 +495,23 @@ app.Map("/__reload_ws", async context =>
     {
         using var ws = await context.WebSockets.AcceptWebSocketAsync();
         var reader = reloadChannel.Reader;
-        while (ws.State == WebSocketState.Open)
+        while (ws.State == WebSocketState.Open && !cts.Token.IsCancellationRequested)
         {
-            await reader.WaitToReadAsync();
-            while (reader.TryRead(out var _))
+            try
             {
-                if (ws.State == WebSocketState.Open)
+                await reader.WaitToReadAsync(cts.Token);
+                while (reader.TryRead(out var _))
                 {
-                    var buffer = System.Text.Encoding.UTF8.GetBytes("reload");
-                    await ws.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+                    if (ws.State == WebSocketState.Open && !cts.Token.IsCancellationRequested)
+                    {
+                        var buffer = System.Text.Encoding.UTF8.GetBytes("reload");
+                        await ws.SendAsync(buffer, WebSocketMessageType.Text, true, cts.Token);
+                    }
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                break;
             }
         }
     }
@@ -570,7 +642,26 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(rootDir)
 });
 
-app.Run("http://localhost:5000");
+// Register cleanup handler
+cts.Token.Register(() => 
+{
+    watcher.EnableRaisingEvents = false;
+    watcher.Dispose();
+    reloadChannel.Writer.TryComplete();
+});
+
+// Get the application lifetime
+var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+
+// Register the cancellation token to stop the application
+cts.Token.Register(() => lifetime.StopApplication());
+
+// Run the app with the specified URL
+await app.RunAsync("http://localhost:5000");
+
+// Clean exit after graceful shutdown
+logger.LogInformation("Server stopped.");
+Environment.Exit(0);
 
 // ---- Markdown-to-template helper ----
 async Task ServeMarkdownAsHtml(HttpContext context, string mdPath, string searchRoot)
@@ -606,7 +697,7 @@ async Task ServeMarkdownAsHtml(HttpContext context, string mdPath, string search
     var tplHtml = await File.ReadAllTextAsync(tplPath);
     
     // Load global variables first
-    var globalVars = LoadGlobalVariables();
+    var globalVars = LoadGlobalVariables(logger);
     
     // Parse markdown header values, with fallback to global variables
     var title = ParseHeaderValue(mdRaw, "title") ?? globalVars.GetValueOrDefault("title")?.ToString() ?? "Untitled";
@@ -624,7 +715,7 @@ async Task ServeMarkdownAsHtml(HttpContext context, string mdPath, string search
     string output = tplHtml;
     
     // Process file imports first (with circular reference protection)
-    output = ProcessFileImports(output, 0);
+    output = ProcessFileImports(output, 0, logger);
     
     // Process advanced template replacements (e.g., {{tags:%%template%%}})
     output = ProcessAdvancedReplacements(output, mdRaw);
@@ -699,12 +790,12 @@ string ProcessAdvancedReplacements(string template, string markdownRaw)
 }
 
 // Process file imports with circular reference protection
-string ProcessFileImports(string template, int depth)
+string ProcessFileImports(string template, int depth, ILogger logger)
 {
     // Prevent infinite recursion - max 10 levels of imports
     if (depth >= 10)
     {
-        Console.WriteLine($"Warning: Maximum import depth (10) reached, skipping further imports");
+        logger.LogWarning("Maximum import depth (10) reached, skipping further imports");
         return template;
     }
     
@@ -735,18 +826,18 @@ string ProcessFileImports(string template, int depth)
                 string fileContent = File.ReadAllText(resolvedPath);
                 template = template.Replace(fullMatch, fileContent);
                 hasReplacements = true;
-                Console.WriteLine($"Imported file: {filePath} -> {resolvedPath}");
+                logger.LogDebug("Imported file: {Source} -> {Resolved}", filePath, resolvedPath);
             }
             else
             {
-                Console.WriteLine($"Warning: File not found for import: {filePath} (resolved to: {resolvedPath})");
+                logger.LogWarning("File not found for import: {File} (resolved to: {Resolved})", filePath, resolvedPath);
                 // Replace with empty string or leave a comment
                 template = template.Replace(fullMatch, $"<!-- File not found: {filePath} -->");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error importing file {filePath}: {ex.Message}");
+            logger.LogError(ex, "Error importing file {File}", filePath);
             template = template.Replace(fullMatch, $"<!-- Error importing {filePath}: {ex.Message} -->");
         }
     }
@@ -754,7 +845,7 @@ string ProcessFileImports(string template, int depth)
     // If we made replacements, check for new imports recursively
     if (hasReplacements)
     {
-        return ProcessFileImports(template, depth + 1);
+        return ProcessFileImports(template, depth + 1, logger);
     }
     
     return template;
