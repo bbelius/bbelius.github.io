@@ -7,6 +7,14 @@ import { factsPlugin } from '/lib/markdrown/plugins/facts-plugin.js';
 // === COMMON UTILS ===
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
+// Email obfuscation
+function initEmailLink() {
+    const emailElement = document.getElementById('email-link');
+    if (emailElement) {
+        emailElement.innerHTML = '<a href="&#109;ailt&#111;&#58;h&#101;ll%6F&#64;b%&#54;2el&#105;u&#37;7&#51;&#46;&#37;&#54;&#52;e%76">he&#108;lo&#64;b&#98;&#101;liu&#115;&#46;dev</a>';
+    }
+}
+
 function lerp(a, b, t) { return a + (b - a) * t; }
 
 // Parse OKLCH color string to components
@@ -91,14 +99,6 @@ function updatePrimaryColor() {
     
     // Set primary OKLCH color
     document.documentElement.style.setProperty('--aurora-primary', oklchColor);
-    
-    // Set all alpha variants of the primary color
-    const alphaValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
-    alphaValues.forEach(alpha => {
-        const alphaDecimal = alpha / 100;
-        const alphaColor = oklchColor.replace(')', ` / ${alphaDecimal})`);
-        document.documentElement.style.setProperty(`--aurora-primary-a${alpha.toString().padStart(2, '0')}`, alphaColor);
-    });
 }
 
 // Initialize color system
@@ -221,14 +221,9 @@ function addTitleQueryParam() {
         return;
     }
     
-    // Try to find the title from the rendered content
-    const titleElement = document.querySelector('.markdrown-content h1') || 
-                       document.querySelector('#markdrown-output h1') ||
-                       document.querySelector('.blog-post-header h1') ||
-                       document.querySelector('h1');
-    
-    if (titleElement) {
-        const title = titleElement.textContent.trim();
+    // Only use title from markdown metadata
+    if (mdParser && mdParser.metaHeader && mdParser.metaHeader.title) {
+        const title = mdParser.metaHeader.title.trim();
         // Replace non-safe characters with underscore
         const safeTitle = title.replace(/[^a-zA-Z0-9-]/g, '_');
         
@@ -269,9 +264,325 @@ function initializeBlogFunctionality() {
             initBlogMenu();
             setupBasicEventListeners();
         }
+        
+        // Initialize blog articles list if articles container exists
+        initBlogArticlesList();
     };
     
     checkElements();
+}
+
+// Load and display blog articles list
+async function initBlogArticlesList() {
+    const articlesContainer = document.getElementById('articles');
+    if (!articlesContainer) return;
+    
+    try {
+        const response = await fetch('/menu.html');
+        if (!response.ok) throw new Error('Failed to load menu');
+        
+        const menuHtml = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(menuHtml, 'text/html');
+        
+        const menuPosts = doc.querySelectorAll('.menu-post-item');
+        
+        // Convert to array and sort by date (newest first)
+        const postsArray = Array.from(menuPosts);
+        postsArray.sort((a, b) => {
+            const dateA = new Date(a.dataset.date);
+            const dateB = new Date(b.dataset.date);
+            return dateB - dateA;
+        });
+        
+        // Collect all categories and tags for filters
+        const allCategories = new Set();
+        const allTags = new Set();
+        
+        postsArray
+            .filter(post => post.dataset.category !== 'overview')
+            .forEach(post => {
+                // Collect categories
+                const category = post.dataset.category;
+                if (category) {
+                    allCategories.add(category);
+                }
+                
+                // Collect tags
+                const tags = post.dataset.tags;
+                if (tags) {
+                    try {
+                        const tagArray = JSON.parse(tags);
+                        tagArray.forEach(tag => allTags.add(tag));
+                    } catch (e) {
+                        const tagArray = tags.split(',').map(t => t.trim()).filter(t => t);
+                        tagArray.forEach(tag => allTags.add(tag));
+                    }
+                }
+            });
+        
+        // Clear container and insert sorted articles
+        articlesContainer.innerHTML = '';
+        postsArray
+            .filter(post => post.dataset.category !== 'overview')
+            .forEach(post => {
+                const article = post.cloneNode(true);
+                articlesContainer.appendChild(article);
+                
+                // Render UI inside each article based on data attributes
+                const title = article.dataset.title || '';
+                const author = article.dataset.author || '';
+                const date = article.dataset.date || '';
+                const description = article.dataset.description || '';
+                const tags = article.dataset.tags || '';
+                const category = article.dataset.category || '';
+                const slug = article.dataset.slug || '';
+                const picture = article.dataset.picture || '';
+                
+                const formattedDate = new Date(date).toISOString().split('T')[0];
+                
+                // Parse tags
+                let tagArray = [];
+                if (tags) {
+                    try {
+                        tagArray = JSON.parse(tags);
+                    } catch (e) {
+                        tagArray = tags.split(',').map(t => t.trim()).filter(t => t);
+                    }
+                }
+                
+                // Remove menu classes and add blog overview styling
+                article.className = 'blog-overview-card';
+                
+                // Render proper blog overview UI with actual image or placeholder
+                const imageHtml = picture ? 
+                    `<img src="${picture}" alt="${title}" loading="lazy">` : 
+                    `<div class="image-placeholder">
+                        <i data-lucide="image" class="placeholder-icon"></i>
+                    </div>`;
+                
+                article.innerHTML = `
+                    <div class="post-image">
+                        ${imageHtml}
+                        <span class="category ${category}">${category}</span>
+                    </div>
+                    <div class="post-content">
+                        <time class="date">${formattedDate}</time>
+                        <h2 class="title">${title}</h2>
+                        <p class="excerpt">${description}</p>
+                        ${tagArray.length > 0 ? `
+                        <div class="tags">
+                            ${tagArray.map(tag => `<span class="tag">#${tag}</span>`).join('')}
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                article.style.cursor = 'pointer';
+                article.onclick = () => window.location.href = `/${slug}`;
+            });
+        
+        // Initialize search functionality after articles are loaded
+        initBlogSearch(allCategories, allTags);
+        
+    } catch (error) {
+        console.error('Failed to load blog articles:', error);
+        articlesContainer.innerHTML = '<p class="error-message">Failed to load blog articles.</p>';
+    }
+}
+
+// Initialize blog search functionality
+function initBlogSearch(allCategories, allTags) {
+    const searchInput = document.getElementById('blog-search');
+    const searchClear = document.getElementById('search-clear');
+    const articlesContainer = document.getElementById('articles');
+    const categoryFilters = document.getElementById('category-filters');
+    const tagFilters = document.getElementById('tag-filters');
+    const clearFilters = document.getElementById('clear-filters');
+    const filterToggle = document.getElementById('filter-toggle');
+    const filterSection = document.getElementById('filter-section');
+    
+    if (!searchInput || !searchClear || !articlesContainer || !categoryFilters || !tagFilters || !filterToggle || !filterSection) return;
+    
+    let allArticles = Array.from(articlesContainer.querySelectorAll('.blog-overview-card'));
+    let activeCategories = new Set();
+    let activeTags = new Set();
+    let filtersVisible = false;
+    
+    // Toggle filters visibility
+    function toggleFilters() {
+        filtersVisible = !filtersVisible;
+        if (filtersVisible) {
+            filterSection.classList.remove('hidden');
+            filterToggle.classList.add('active');
+        } else {
+            filterSection.classList.add('hidden');
+            filterToggle.classList.remove('active');
+        }
+    }
+    
+    // Populate category filters
+    Array.from(allCategories).sort().forEach(category => {
+        const button = document.createElement('button');
+        button.className = 'filter-button category';
+        button.textContent = category;
+        button.dataset.category = category;
+        button.addEventListener('click', () => toggleCategoryFilter(category, button));
+        categoryFilters.appendChild(button);
+    });
+    
+    // Populate tag filters
+    Array.from(allTags).sort().forEach(tag => {
+        const button = document.createElement('button');
+        button.className = 'filter-button tag';
+        button.textContent = tag;
+        button.dataset.tag = tag;
+        button.addEventListener('click', () => toggleTagFilter(tag, button));
+        tagFilters.appendChild(button);
+    });
+    
+    // Toggle category filter
+    function toggleCategoryFilter(category, button) {
+        if (activeCategories.has(category)) {
+            activeCategories.delete(category);
+            button.classList.remove('active');
+        } else {
+            activeCategories.add(category);
+            button.classList.add('active');
+        }
+        performSearch();
+        updateClearFiltersButton();
+    }
+    
+    // Toggle tag filter
+    function toggleTagFilter(tag, button) {
+        if (activeTags.has(tag)) {
+            activeTags.delete(tag);
+            button.classList.remove('active');
+        } else {
+            activeTags.add(tag);
+            button.classList.add('active');
+        }
+        performSearch();
+        updateClearFiltersButton();
+    }
+    
+    // Update clear filters button state
+    function updateClearFiltersButton() {
+        const hasActiveFilters = activeCategories.size > 0 || activeTags.size > 0;
+        clearFilters.disabled = !hasActiveFilters;
+    }
+    
+    // Search function
+    function performSearch() {
+        const query = searchInput.value.toLowerCase().trim();
+        
+        // Show/hide clear button
+        if (query) {
+            searchClear.classList.add('visible');
+        } else {
+            searchClear.classList.remove('visible');
+        }
+        
+        // Filter articles
+        allArticles.forEach(article => {
+            let matches = true;
+            
+            // Text search
+            if (query) {
+                const title = (article.dataset.title || '').toLowerCase();
+                const description = (article.dataset.description || '').toLowerCase();
+                const tags = (article.dataset.tags || '').toLowerCase();
+                const category = (article.dataset.category || '').toLowerCase();
+                const subtitle = (article.dataset.subtitle || '').toLowerCase();
+                
+                const textMatches = title.includes(query) || 
+                                  description.includes(query) || 
+                                  tags.includes(query) || 
+                                  category.includes(query) || 
+                                  subtitle.includes(query);
+                
+                if (!textMatches) matches = false;
+            }
+            
+            // Category filter (OR logic - any selected category)
+            if (activeCategories.size > 0) {
+                const articleCategory = article.dataset.category;
+                if (!activeCategories.has(articleCategory)) {
+                    matches = false;
+                }
+            }
+            
+            // Tag filter (OR logic - any selected tag)
+            if (activeTags.size > 0) {
+                const articleTags = article.dataset.tags;
+                let hasMatchingTag = false;
+                
+                if (articleTags) {
+                    try {
+                        const tagArray = JSON.parse(articleTags);
+                        hasMatchingTag = tagArray.some(tag => activeTags.has(tag));
+                    } catch (e) {
+                        const tagArray = articleTags.split(',').map(t => t.trim()).filter(t => t);
+                        hasMatchingTag = tagArray.some(tag => activeTags.has(tag));
+                    }
+                }
+                
+                if (!hasMatchingTag) {
+                    matches = false;
+                }
+            }
+            
+            article.style.display = matches ? 'flex' : 'none';
+        });
+    }
+    
+    // Clear search
+    function clearSearch() {
+        searchInput.value = '';
+        searchClear.classList.remove('visible');
+        performSearch();
+        searchInput.focus();
+    }
+    
+    // Clear all filters
+    function clearAllFilters() {
+        // Clear categories
+        activeCategories.clear();
+        categoryFilters.querySelectorAll('.filter-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Clear tags
+        activeTags.clear();
+        tagFilters.querySelectorAll('.filter-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Clear search text
+        searchInput.value = '';
+        searchClear.classList.remove('visible');
+        
+        // Update UI
+        performSearch();
+        updateClearFiltersButton();
+    }
+    
+    // Event listeners
+    searchInput.addEventListener('input', performSearch);
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            clearSearch();
+        }
+    });
+    
+    searchClear.addEventListener('click', clearSearch);
+    clearFilters.addEventListener('click', clearAllFilters);
+    filterToggle.addEventListener('click', toggleFilters);
+    
+    // Initial setup
+    updateClearFiltersButton();
+    performSearch();
 }
 
 // Tab switching
@@ -382,6 +693,7 @@ function render() {
         
         // ADD THIS LINE - Setup external links after rendering
         setupExternalLinks();
+        initEmailLink();
         
         // Add title query param for blog posts
         addTitleQueryParam();

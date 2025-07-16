@@ -7,6 +7,7 @@ date: 2025-06-24
 description: Experience regarding AI augumented development of this blog.
 tags: ["blog", "ai", "agent"]
 category: projects
+picture: /img/blog/0624.jpg
 ---
 
 ### How to Create This Website

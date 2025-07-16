@@ -7,6 +7,7 @@ date: 2025-06-20
 description: Showcase and Testdocument
 tags: ["blog", "markdown", "northlight"]
 category: projects
+picture: /img/blog/0620.jpg
 ---
 
 ### Table of Contents

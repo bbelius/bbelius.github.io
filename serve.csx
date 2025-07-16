@@ -147,6 +147,7 @@ class MarkdownMetadata
     public string Type { get; set; } = "";
     public string Slug { get; set; } = "";
     public string Category { get; set; } = "";
+    public string Picture { get; set; } = "";
 }
 
 Dictionary<string, List<MarkdownMetadata>> ScanMarkdownFiles(ILogger logger)
@@ -192,7 +193,8 @@ Dictionary<string, List<MarkdownMetadata>> ScanMarkdownFiles(ILogger logger)
                 Description = ParseHeaderValue(content, "description") ?? "",
                 Tags = ParseHeaderValue(content, "tags") ?? "",
                 Type = ParseHeaderValue(content, "type") ?? "",
-                Category = ParseHeaderValue(content, "category") ?? ""
+                Category = ParseHeaderValue(content, "category") ?? "",
+                Picture = ParseHeaderValue(content, "picture") ?? ""
             };
             
             // Generate slug from file path
@@ -299,7 +301,8 @@ string ProcessTypeReplacements(string template, Dictionary<string, List<Markdown
                 .Replace("{{tags}}", file.Tags)
                 .Replace("{{type}}", file.Type)
                 .Replace("{{slug}}", file.Slug)
-                .Replace("{{category}}", file.Category);
+                .Replace("{{category}}", file.Category)
+                .Replace("{{picture}}", file.Picture);
             
             result.Append(processedTemplate);
         }
@@ -637,6 +640,22 @@ app.Use(async (context, next) =>
     await next();
 });
 
+// Handle 404 errors with preprocessed 404.html
+app.Use(async (context, next) =>
+{
+    await next();
+    
+    if (context.Response.StatusCode == 404 && !context.Response.HasStarted)
+    {
+        if (preprocessedFiles.ContainsKey("/404.html"))
+        {
+            context.Response.StatusCode = 404;
+            context.Response.ContentType = "text/html";
+            await context.Response.WriteAsync(InjectReloadOverlay(preprocessedFiles["/404.html"]));
+        }
+    }
+});
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(rootDir)
@@ -721,7 +740,9 @@ async Task ServeMarkdownAsHtml(HttpContext context, string mdPath, string search
     output = ProcessAdvancedReplacements(output, mdRaw);
     
     // Replace simple template variables
-    output = output.Replace("{{md}}", mdRaw);
+    // Escape HTML for source display to prevent highlight.js issues
+    var escapedMd = System.Net.WebUtility.HtmlEncode(mdRaw);
+    output = output.Replace("{{md}}", escapedMd);
     output = output.Replace("{{title}}", title);
     output = output.Replace("{{subtitle}}", subtitle);
     output = output.Replace("{{tags}}", tags);

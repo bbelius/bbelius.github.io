@@ -15,7 +15,7 @@
     transition: all 0.2s ease;
     border: 0.5px solid var(--aurora-white-a10);
     border-left: 4px solid var(--aurora-primary);
-    box-shadow: inset 0 1px 0 var(--aurora-white-a5), inset 0 -0.5px 0 rgba(0, 0, 0, 0.03), inset 1px 0 0 var(--aurora-white-a2), inset -0.5px 0 0 rgba(0, 0, 0, 0.015), 0 2px 8px var(--aurora-primary-a5), 0 1px 3px var(--aurora-black-a4), 0 0 0 0.5px var(--aurora-white-a2);
+    box-shadow: inset 0 1px 0 var(--aurora-white-a05), inset 0 -0.5px 0 rgba(0, 0, 0, 0.03), inset 1px 0 0 var(--aurora-white-a02), inset -0.5px 0 0 rgba(0, 0, 0, 0.015), 0 2px 8px var(--aurora-primary-a05), 0 1px 3px var(--aurora-black-a04), 0 0 0 0.5px var(--aurora-white-a02);
 }
 
 .workflow-step::before {
@@ -23,7 +23,7 @@
     position: absolute;
     inset: 0;
     border-radius: 16px;
-    background: radial-gradient(ellipse 250% 100% at 50% 0%, var(--aurora-white-a4) 0%, var(--aurora-white-a2) 50%, transparent 100%);
+    background: radial-gradient(ellipse 250% 100% at 50% 0%, var(--aurora-white-a04) 0%, var(--aurora-white-a02) 50%, transparent 100%);
     pointer-events: none;
     z-index: 1;
 }
@@ -62,7 +62,7 @@
 
 .step-title {
     margin: 0;
-    color: var(--aurora-fg-base);
+    color: var(--aurora-white-a85);
     font-size: 1.25rem;
     font-weight: 600;
     line-height: 1.2;
@@ -70,7 +70,7 @@
 }
 
 .step-content {
-    color: var(--aurora-fg-meta);
+    color: var(--aurora-white-a60);
     line-height: 1.6;
 }
 

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" class="aurora">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#121212">
+    
+{{#headercontent.tpl.html}}
+
+{{#styles.tpl.html}}
+</head>
+<body data-page="blog">
+    <div id="navigation-placeholder"></div>
+    
+    <!-- Blog Menu -->
+    <div id="blog-menu-container"></div>
+    
+    <!-- Desktop Menu Hover Trigger -->
+    <div class="blog-menu-hover-trigger" id="blog-menu-hover-trigger"></div>
+    
+    <!-- Desktop Menu Indicator (always visible) -->
+    <div class="blog-menu-indicator" id="blog-menu-indicator"></div>
+
+
+    <main class="container">
+        <div class="inner-container">
+            
+            <div class="blog-search-container">
+                <div class="search-bar">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" id="blog-search" placeholder="Search posts..." class="search-input">
+                    <button id="search-clear" class="search-clear" aria-label="Clear search">
+                        <i data-lucide="x" class="clear-icon"></i>
+                    </button>
+                    <button id="filter-toggle" class="filter-toggle" aria-label="Toggle filters">
+                        <i data-lucide="filter" class="filter-icon"></i>
+                    </button>
+                </div>
+                
+                <div class="filter-section hidden" id="filter-section">
+                    <div class="filter-group">
+                        <label class="filter-label">Categories:</label>
+                        <div class="category-filters" id="category-filters">
+                            <!-- Categories will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Tags:</label>
+                        <div class="tag-filters" id="tag-filters">
+                            <!-- Tags will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <button class="clear-filters" id="clear-filters">Clear All Filters</button>
+                </div>
+            </div>
+            
+            <div id="articles">
+            </div>
+        </div>
+
+{{#footer.tpl.html}}
+    </main>
+
+{{#scripts.tpl.html}}
+
+</body>
+</html>

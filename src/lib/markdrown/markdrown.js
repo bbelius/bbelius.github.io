@@ -669,7 +669,7 @@ function blockquoteWithTitlePlugin(parserInstance) {
             if (cssClass) html += ` class="${Markdrown.escapeHTML(cssClass)}"`;
             html += '>';
             if (header) {
-                html += `<div class="bq-title">${Markdrown.escapeHTML(header)}</div>`;
+                html += `<div class="title">${Markdrown.escapeHTML(header)}</div>`;
             }
             // Render body with **full block parser**
             html += parserInstance.parse(bodyLines.join('\n'), false); // Don't wrap sections in blockquotes
@@ -884,7 +884,13 @@ function htmlPassthroughPlugin() {
         priority: 1, // Very high priority - run before most other plugins
         parse: (lines, i, _inline) => {
             const line = lines[i];
-            const htmlTagRegex = /^\s*<(?:\/?[a-zA-Z][a-zA-Z0-9]*(?:\s+[^>]*)?\/?\s*>|!(?:--|\s*DOCTYPE))/;
+            // More comprehensive HTML detection including:
+            // - Opening/closing tags: <div>, </div>
+            // - Self-closing tags: <br/>, <img/>
+            // - Comments: <!-- -->
+            // - DOCTYPE declarations
+            // - Content within tags (not just tag start)
+            const htmlTagRegex = /^\s*<(?:[a-zA-Z][a-zA-Z0-9]*(?:\s+[^>]*)?\/?>|\/[a-zA-Z][a-zA-Z0-9]*\s*>|!(?:--.*?--|DOCTYPE\s))/i;
             
             if (!htmlTagRegex.test(line)) {
                 return; // Not an HTML line, let other plugins handle it
