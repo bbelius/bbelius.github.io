@@ -1,4 +1,5 @@
 ---
+publish: false
 tpl: blog
 title: NorthLight Design Reference
 subtitle: Developer Reference

@@ -13,12 +13,12 @@
     border-radius: 16px;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     text-align: center;
-    box-shadow: inset 0 1px 0 var(--aurora-white-a05), inset 0 -0.5px 0 var(--aurora-black-a03), inset 1px 0 0 var(--aurora-white-a02), inset -0.5px 0 0 var(--aurora-black-a02), 0 2px 8px var(--aurora-primary-a05), 0 1px 3px var(--aurora-black-a04), 0 0 0 0.5px var(--aurora-white-a02);
+    box-shadow: var(--aurora-glass-pattern);
 }
 
 .facts-grid .facts-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px var(--aurora-black-a20);
+    box-shadow: var(--aurora-shadow-hover);
 }
 
 .facts-grid .facts-card.green {

@@ -1,7 +1,8 @@
 ---
+publish: true
 tpl: blog
 title: MarkDrown Reference Documentation
-subtitle: Building a Blog with AI Agents
+subtitle: Features and Syntax
 author: Ben
 date: 2025-06-20
 description: Showcase and Testdocument
@@ -21,11 +22,12 @@ picture: /img/blog/0620.jpg
 7. [Icons (Lucide)](#icons)
 8. [Lists](#lists)
 9. [Task Lists](#task-lists)
-10. [Blockquotes](#blockquotes)
-11. [Tables](#tables)
-12. [CSS Grid Blocks](#css-grid-blocks)
-13. [Horizontal Rules](#horizontal-rules)
-14. [Combos & Advanced](#combos-advanced)
+10. [Feature Lists](#feature-lists)
+11. [Blockquotes](#blockquotes)
+12. [Tables](#tables)
+13. [CSS Grid Blocks](#css-grid-blocks)
+14. [Horizontal Rules](#horizontal-rules)
+15. [Combos & Advanced](#combos-advanced)
 
 ---
 
@@ -110,10 +112,10 @@ console.log('with filename');
 
 ### #links Links
 
-[bbelius.dev](https://bbelius.dev)
+[belikov.dev](https://belikov.dev)
 
 ```md
-[bbelius.dev](https://bbelius.dev)
+[belikov.dev](https://belikov.dev)
 ```
 
 ### #images-figures Images & Figures
@@ -240,6 +242,40 @@ Nested:
 - [-] Partial
   - [ ] Subtask
 ```
+
+### #feature-lists Feature Lists
+
+Interactive skill/feature lists with clickable tags and descriptions:
+
+!features Example Features
+* example-one | rocket | First Feature
+/ 2023+ • Company Name
+  Description of the first feature with **bold** and *italic* support.
+
+* example-two | server-cog | Second Feature
+/ 10+ years • Another Company
+  Description of the second feature.
+!/features
+
+```md
+!features Example Features
+* example-one | rocket | First Feature
+/ 2023+ • Company Name
+  Description of the first feature with **bold** and *italic* support.
+
+* example-two | server-cog | Second Feature
+/ 10+ years • Another Company
+  Description of the second feature.
+!/features
+```
+
+**Syntax:**
+- Start with `!features` followed by optional section title
+- Each feature: `* feature-id | lucide-icon | Display Name`
+- Meta line: `/` prefix followed by meta information (dates, companies, etc.)
+- Following lines: description content (supports **formatting**)
+- Optional tags line: `%` prefix with comma-separated tags (applies to all features)
+- End with `!/features`
 
 ### #blockquotes Blockquotes
 
@@ -376,7 +412,3 @@ Combine features:
 > alert('yes');
 > ```
 ```
-
-### More...
-
-TODO: Document latest plugins

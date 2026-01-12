@@ -9,7 +9,7 @@
   --aurora-yellow: oklch(0.8 0.2 84);
   --aurora-red: oklch(0.6 0.2 25);
   --aurora-blue: oklch(0.7 0.2 255);
-  --aurora-purple: oklch(0.598 0.277 320);
+  --aurora-purple: oklch(0.58 0.25 295);
   --aurora-grey: oklch(0.7 0 0);
   --aurora-darkgrey: oklch(0.2 0 263);
   --aurora-shadow: oklch(0.12 0.01 220);
@@ -18,7 +18,7 @@
   /* Background colors */
   --aurora-bg-grad-acc-1: oklch(0.765 0.151 229.5 / 0.18);
   --aurora-bg-grad-acc-2: var(--aurora-purple-a20);
-  --aurora-bg-grad-acc-3: oklch(0.659 0.275 350.0 / 0.18);
+  --aurora-bg-grad-acc-3: var(--aurora-green-a20);
   --aurora-bg-grad-start: oklch(0.122 0.000 263.3);
   --aurora-bg-grad-end: oklch(0.226 0.000 263.3);
 
@@ -315,4 +315,57 @@
   --aurora-red-a90: oklch(from var(--aurora-red) l c h / 0.90);
   --aurora-red-a95: oklch(from var(--aurora-red) l c h / 0.95);
 
+  /* Glass & Surface Backgrounds */
+  --aurora-glass-background: linear-gradient(135deg, var(--aurora-white-a05) 0%, var(--aurora-white-a02) 100%);
+  --aurora-glass-background-hover: linear-gradient(135deg, var(--aurora-white-a10) 0%, var(--aurora-white-a05) 100%);
+  --aurora-surface-subtle: linear-gradient(135deg, var(--aurora-white-a03) 0%, var(--aurora-white-a01) 100%);
+  --aurora-primary-gradient: linear-gradient(135deg, var(--aurora-primary) 0%, var(--aurora-primary-a80) 100%);
+  --aurora-primary-gradient-subtle: linear-gradient(135deg, var(--aurora-primary-a15) 0%, var(--aurora-primary-a10) 100%);
+
+  /* Shadows */
+  --aurora-glass-pattern: inset 0 1px 0 var(--aurora-white-a05),
+      inset 0 -0.5px 0 rgba(0, 0, 0, 0.03),
+      inset 1px 0 0 var(--aurora-white-a02),
+      inset -0.5px 0 0 rgba(0, 0, 0, 0.015),
+      0 2px 8px var(--aurora-primary-a05),
+      0 1px 3px var(--aurora-black-a04),
+      0 0 0 0.5px var(--aurora-white-a02);
+  --aurora-container-shadow: 0 8px 32px var(--aurora-black-a60),
+      0 0 0 1px var(--aurora-black-a10),
+      inset 0 1px 0 var(--aurora-black-a05);
+  --aurora-card-shadow: 0 4px 20px var(--aurora-black-a20),
+      0 0 0 1px var(--aurora-black-a05),
+      inset 0 1px 0 var(--aurora-black-a05);
+
+  --aurora-shadow-xs: 0 1px 2px oklch(from var(--aurora-shadow) l c h / 0.04);
+  --aurora-shadow-sm: 0 2px 8px oklch(from var(--aurora-shadow) l c h / 0.08);
+  --aurora-shadow-md: 0 8px 32px oklch(from var(--aurora-shadow) l c h / 0.16);
+  --aurora-shadow-lg: 0 12px 40px oklch(from var(--aurora-shadow) l c h / 0.20);
+  --aurora-shadow-inset: inset 0 1px 2px oklch(from var(--aurora-shadow) l c h / 0.09);
+
+  /* Hover/Elevated shadows with primary color */
+  --aurora-shadow-hover: 0 8px 25px var(--aurora-primary-a20);
+  --aurora-shadow-elevated: 0 12px 40px var(--aurora-primary-a30);
+
+  /* Glow effects (spread without blur offset) */
+  --aurora-glow-xs: 0 0 5px var(--aurora-primary-a30);
+  --aurora-glow-sm: 0 0 8px var(--aurora-primary-a30);
+  --aurora-glow-md: 0 0 12px var(--aurora-primary-a50);
+  --aurora-glow-lg: 0 0 20px var(--aurora-primary-a50);
+
+  /* Filter drop-shadow for icons */
+  --aurora-drop-glow-sm: drop-shadow(0 0 8px var(--aurora-primary-a50));
+  --aurora-drop-glow-md: drop-shadow(0 0 12px var(--aurora-primary-a60));
+  --aurora-drop-glow-lg: drop-shadow(0 0 20px var(--aurora-primary-a30));
+
+  /* Focus rings */
+  --aurora-focus-ring: 0 0 0 2px var(--aurora-primary-a10);
+  --aurora-focus-ring-lg: 0 0 0 3px var(--aurora-primary-a10);
+
+  /* Text shadows/glows */
+  --aurora-text-glow: 0 0 20px var(--aurora-primary-a30);
+  --aurora-text-glow-lg: 0 0 40px var(--aurora-primary-a30);
+
+  /* Directional shadows */
+  --aurora-shadow-side: 4px 0 32px var(--aurora-black-a40);
 }

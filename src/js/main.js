@@ -11,7 +11,7 @@ function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 function initEmailLink() {
     const emailElement = document.getElementById('email-link');
     if (emailElement) {
-        emailElement.innerHTML = '<a href="&#109;ailt&#111;&#58;h&#101;ll%6F&#64;b%&#54;2el&#105;u&#37;7&#51;&#46;&#37;&#54;&#52;e%76">he&#108;lo&#64;b&#98;&#101;liu&#115;&#46;dev</a>';
+        emailElement.innerHTML = '<a href="&#109;ailt&#111;&#58;b&#101;n&#64;b%65%6c%69%6b%6fv&#46;d&#101;v">b&#101;n&#64;b&#101;likov&#46;dev</a>';
     }
 }
 
@@ -49,30 +49,30 @@ function lerpOKLCH(oklch1, oklch2, t) {
 
 // ===== DYNAMIC PRIMARY COLOR (OKLCH unified palette) =====
 const colorStopsOKLCH = [
-    "oklch(0.58 0.18 220)", // 00:00 - Midnight Indigo
-    "oklch(0.60 0.20 240)", // 01:00 - Deep Blue
-    "oklch(0.63 0.22 260)", // 02:00 - Deep Night Blue
-    "oklch(0.64 0.22 265)", // 03:00 - Pre-dawn Blue
-    "oklch(0.66 0.21 270)", // 04:00 - Faint Dawn Blue
-    "oklch(0.75 0.22 45)",  // 05:00 - Hint of Gold Begins
-    "oklch(0.90 0.26 90)",  // 06:00 - Bright Gold
-    "oklch(0.97 0.29 105)", // 07:00 - Full Morning Gold
-    "oklch(0.85 0.24 130)", // 08:00 - Vivid Spring Green
-    "oklch(0.84 0.24 160)", // 09:00 - Warming Cyan-Green
-    "oklch(0.85 0.25 195)", // 10:00 - Sky Cyan
-    "oklch(0.87 0.25 210)", // 11:00 - Daylight Cyan-Blue
-    "oklch(0.88 0.25 220)", // 12:00 - Electric Blue
-    "oklch(0.84 0.25 230)", // 13:00 - Clear Blue
-    "oklch(0.78 0.26 250)", // 14:00 - Bold Blue
-    "oklch(0.75 0.25 260)", // 15:00 - Azure Edge
-    "oklch(0.73 0.25 265)", // 16:00 - Azure Boost
-    "oklch(0.68 0.26 270)", // 17:00 - Evening Blue Tint
-    "oklch(0.60 0.26 275)", // 18:00 - Cerulean Deep
-    "oklch(0.68 0.26 20)",  // 19:00 - Hints of Coral
-    "oklch(0.78 0.27 35)",  // 20:00 - Sunset Coral
-    "oklch(0.70 0.24 50)",  // 21:00 - Fading Coral
-    "oklch(0.68 0.22 295)", // 22:00 - Night Violet
-    "oklch(0.63 0.20 240)"  // 23:00 - Rich Indigo
+    "oklch(0.55 0.15 220)", // 00:00 - Midnight Blue
+    "oklch(0.52 0.14 210)", // 01:00 - Deep Ocean
+    "oklch(0.50 0.12 200)", // 02:00 - Deep Night Teal
+    "oklch(0.52 0.13 195)", // 03:00 - Pre-dawn Teal
+    "oklch(0.58 0.16 180)", // 04:00 - Faint Dawn Cyan
+    "oklch(0.70 0.20 40)",  // 05:00 - Hint of Amber
+    "oklch(0.85 0.24 75)",  // 06:00 - Bright Gold
+    "oklch(0.92 0.26 90)",  // 07:00 - Full Morning Gold
+    "oklch(0.85 0.22 120)", // 08:00 - Fresh Green
+    "oklch(0.82 0.22 150)", // 09:00 - Warming Cyan-Green
+    "oklch(0.83 0.23 180)", // 10:00 - Sky Teal
+    "oklch(0.85 0.24 200)", // 11:00 - Daylight Cyan
+    "oklch(0.86 0.24 210)", // 12:00 - Clear Cyan-Blue
+    "oklch(0.82 0.24 220)", // 13:00 - Afternoon Blue
+    "oklch(0.78 0.24 230)", // 14:00 - Bold Blue
+    "oklch(0.74 0.23 235)", // 15:00 - Azure
+    "oklch(0.70 0.22 230)", // 16:00 - Late Afternoon Blue
+    "oklch(0.68 0.24 40)",  // 17:00 - Golden Hour Begins
+    "oklch(0.72 0.26 30)",  // 18:00 - Sunset Coral
+    "oklch(0.70 0.25 25)",  // 19:00 - Deep Coral
+    "oklch(0.65 0.22 20)",  // 20:00 - Fading Ember
+    "oklch(0.58 0.18 15)",  // 21:00 - Warm Dusk
+    "oklch(0.52 0.14 200)", // 22:00 - Night Teal
+    "oklch(0.53 0.15 210)"  // 23:00 - Deep Night Blue
 ];
 
 let debugDemoTime = null;

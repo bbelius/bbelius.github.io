@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /imprint.html
 
-Sitemap: https://bbelius.dev/sitemap.xml
+Sitemap: https://belikov.dev/sitemap.xml

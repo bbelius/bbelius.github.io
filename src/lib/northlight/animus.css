@@ -98,6 +98,37 @@ AURORA ANIMUS - ANIMATION LIBRARY
     }
 }
 
+/* Keyframe Animations */
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(24px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes fadeInStagger {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+
+@keyframes gentleGlow {
+    0%, 100% {
+        opacity: 0.4;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
 /* Fade Classes */
 .animus-fade-in {
     animation: animusFadeIn var(--animus-duration-normal);
@@ -571,7 +602,7 @@ AURORA ANIMUS - ANIMATION LIBRARY
 }
 
 .animus-hover-glow:hover {
-    box-shadow: 0 0 20px var(--aurora-primary-a50);
+    box-shadow: var(--aurora-glow-lg);
 }
 
 .animus-hover-shadow {

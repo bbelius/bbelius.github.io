@@ -1,29 +1,30 @@
 ---
+publish: true
 tpl: blog
-title: AI-Augmented Development
-subtitle: Building a Blog with AI Agents
+title: Building This Website
+subtitle: A Custom Static Site from Scratch
 author: Benjamin Belikov
 date: 2025-06-24
-description: Experience regarding AI augumented development of this blog.
-tags: ["blog", "ai", "agent"]
-category: projects
+description: A look at the custom libraries and design choices behind this website.
+tags: ["blog", "web", "design"]
+category: thoughts
 picture: /img/blog/0624.jpg
 ---
 
-### How to Create This Website
+### Why Build from Scratch?
 
-Curious how far AI has come, I decided to build this site by prompting an AI agent through the entire process.
+Modern web frameworks are powerful, but they come with overhead — build tools, dependencies, and abstractions that can feel excessive for a personal site.
 
-I gave it structure and intent — it handled most of the implementation. Total cost? ~$15 and less than a day's work (mostly researching legal requirements).
+I wanted something different: a lightweight site that loads fast, looks modern, and remains easy to maintain. 
 
-Final touches were made by hand mostly because it was faster than writing another prompt. Some minor visual changes were also done by me to fix alignment issues or to improve the overall look.
+The result is a custom static site with its own template system, markdown parser, and design library.
 
 ### Features
 
 !features Features
 * vanilla | ice-cream-cone | No External Libraries
 / Simple, but Limitless
-  Built using only HTML, CSS, and JavaScript without any external libraries or frameworks.
+  Built using only HTML, CSS, and JavaScript without using backend code.
 
 * design | paintbrush | Modern Design
 / Modern, Sleek, Beautiful
@@ -46,75 +47,61 @@ Final touches were made by hand mostly because it was faster than writing anothe
 
 * hdr | sun | HDR Native
 / Colorful and Vibrant
-  Native high dynamic range (HDR) support for vibrant colors and better contrast with  compatibility for non-HDR displays and browsers.
+  Native high dynamic range (HDR) support for vibrant colors and better contrast with compatibility for non-HDR displays and browsers.
 !/features
 
-### Tooling
+### The Stack
 
-!constellation HowTo
-* me | ![Ben Belikov](/img/profile.jpg) | Me
-% Turn Coffee into Visions, Prompts AI-Agents, [Buy me a Coffee](https://coff.ee/bbelius)
-AI builds fast. I stay in control and steer the process.
+!constellation Stack
+* markdrown | file-text | MarkDrown
+% Custom Markdown Parser, Plugin System
+A custom markdown parser with a plugin architecture. Supports extended syntax for features, workflows, constellations, and more. Each plugin adds new block types without touching the core parser.
 
-* roocode | squirrel | RooCode
-% Free & Open Source, AI Agent, Code Generation, [Check it out](https://roocode.com/)
-VSCode AI Agent extension, capable of understanding and executing complex coding tasks. It supports multiple AI providers, including AI Gateways like OpenRouter.
+* northlight | sun-moon | NorthLight
+% Design System, OKLCH Colors, Glass Morphism
+The design system powering this site. Uses OKLCH color space for HDR-native colors with automatic fallbacks. Includes glass morphism effects and the Animus animation library.
 
-* claude | brain-circuit | AI Agent | AI Agent: Claude Code
-% Code Generation, Perfect RooCode Compatibility, [Check it out](https://www.anthropic.com/)
-Claude is Anthropic's advanced AI assistant known for its strong code generation skills. It excels at understanding complex requirements and producing high-quality, well-structured code.
+* templates | layout-template | Template Engine
+% File Imports, Variable Substitution, Array Expansion
+A simple but flexible template system. Markdown files specify their template via YAML frontmatter. Templates can import other templates, substitute variables, and iterate over collections.
 
-* wsl | bird | WSL2 | WSL2: Windows Subsystem for Linux
-% Linux, Ubuntu, [Check it out](https://learn.microsoft.com/en-us/windows/wsl/install)
-Windows Subsystem for Linux (WSL) allows you to run a full Linux distribution alongside Windows. Of course, if you are using Linux or macOS, you don't need this component.
-
-* openrouter | trending-up-down | OpenRouter | OpenRouter: AI Gateway
-% Code Generation, RooCode Compatibility, [Check it out](https://openrouter.ai/)
-For tasks that require multiple AI models, OpenRouter provides a unified API to access various AI providers. It allows you to switch between models like Claude, Gemini, and others seamlessly.
-
-* lucide | shell | Lucide
+* lucide | shell | Lucide Icons
 % Free & Open Source, 1000+ Icons, SVG Format, [Check it out](https://lucide.dev/)
-A beautiful, customizable icon library that provides consistent, high-quality SVG icons.
-
-* vscode | square-code | Visual Studio Code
-% Free & Open Source, Cross-platform, Extensions, [Check it out](https://code.visualstudio.com/)
-Microsoft's free, open-source code editor that serves as the foundation for modern development. With its extensive extension ecosystem, VSCode provides the perfect environment for AI-assisted coding.
+A beautiful, customizable icon library that provides consistent, high-quality SVG icons throughout the site.
 
 * githubpages | github | GitHub Pages
 % Free Hosting, Custom Domains, Git Integration, [Check it out](https://pages.github.com/)
-Free static site hosting directly from GitHub repositories. GitHub Pages provides seamless deployment for static websites with automatic builds from repository changes, making it perfect for showcasing projects and portfolios.
+Free static site hosting directly from GitHub repositories with automatic deployment on every push.
 !/constellation
 
-### How it works
+### Design Decisions
 
-!workflow stepbystep
-1. Setup VSCode
-Install VSCode and the RooCode extension. Create an OpenRouter API key (or any provider you prefer) and configure RooCode with it and the AI model(s) you want to use.
+!workflow decisions
+1. OKLCH Color Space
+Using OKLCH instead of RGB or HSL. Colors are perceptually uniform, making it easy to create consistent palettes. The accent color smoothly interpolates through the day using OKLCH values.
 
-2. AI-Assisted Development
-Prompt RooCode to generate code, refactor existing code, and/or implement complex features with natural language instructions.
-Choose the AI Model that best fits your needs (Google's Gemini works great for large projects).
+2. Glass Morphism
+Subtle backdrop blur and transparency create depth without heavy shadows. Works well on both light and dark backgrounds while keeping the interface feeling light.
 
-3. Iterative Refinement
-Continuously refine and improve through AI collaboration and/or manual intervention, testing different approaches and optimizing for performance and aesthetics.
+3. Plugin-Based Markdown
+Instead of one monolithic parser, each feature (workflows, constellations, facts) is a separate plugin. Adding new block types means writing a new plugin — the core stays simple.
 
-4. Polish & Deploy
-Fine-tune the final product, clean up the code, and deploy the finished website.
-You want to keep the technical debt low, so monitor what the AI does and guide it.
+4. No Build Step
+Files are served directly during development with on-the-fly template processing. For production, the same files work as-is on any static host.
 !/workflow
 
-### Results & Insights
+### What I Learned
 
 !facts insights
-* speed | gauge | green | Impressive Speed
-  Complex features in minutes - not hours
+* simplicity | feather | green | Simplicity Wins
+  Fewer dependencies means less maintenance burden.
 
-* fast | rabbit | yellow | Fast Output
-  Fast, but fragile. Avoid regressions.
+* custom | wrench | green | Custom Fits Better
+  Building your own tools means they do exactly what you need.
 
-* learning-curve | chart-spline | yellow | Learning Curve
-  Prompting is a skill. Garbage in, garbage out.
+* css | palette | yellow | CSS Has Grown Up
+  Modern CSS handles layouts and effects that once required JavaScript.
 
-* cost | clock-alert | red | Cost & Time
-  Delegate to AI - but stay in control.
+* tradeoffs | scale | yellow | Trade-offs Exist
+  No framework means writing more boilerplate, but full control over the result.
 !/facts
